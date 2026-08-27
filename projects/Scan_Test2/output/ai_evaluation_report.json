@@ -1,0 +1,27 @@
+{
+  "final_score": 85,
+  "iterations_run": 1,
+  "history": [
+    {
+      "overall_score": 85,
+      "is_satisfactory": true,
+      "flaws": [
+        "API Error fallback: HTTP Error 400: Bad Request"
+      ],
+      "recommended_adjustments": {
+        "theta_offset_delta": 0.0,
+        "height_scale": 1.0,
+        "radius_scale": 1.0
+      },
+      "iteration": 1,
+      "params_used": {
+        "height": 0.78,
+        "radius": 0.172,
+        "fillet_size": 0.035,
+        "recess_depth": 0.02,
+        "theta_offset": 0.0,
+        "include_cord": true
+      }
+    }
+  ]
+}

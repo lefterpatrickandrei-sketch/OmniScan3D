@@ -1,0 +1,21 @@
+﻿# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Temporary SQLite & SfM database dumps
+*.db
+*.db-journal
+projects/**/database*.db
+projects/**/db_*.db
+
+# OS / Editor artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Environments
+env/
+venv/
+.venv/

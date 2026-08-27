@@ -1,0 +1,19 @@
+{
+  "project_id": "Scan_Test2",
+  "status": "completed",
+  "elapsed_seconds": 12.0,
+  "metrics": {
+    "total_images": 59,
+    "registered_images": 59,
+    "reconstructed_points": 5954,
+    "mesh_vertices": 5954,
+    "mesh_triangles": 11720
+  },
+  "outputs": {
+    "glb": "model.glb",
+    "obj": "model.obj",
+    "ply_dense": "dense_cloud.ply",
+    "texture": "model_texture.png",
+    "manifest": "geo_manifest.json"
+  }
+}

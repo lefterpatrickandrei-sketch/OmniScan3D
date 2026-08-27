@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>OmniScan 3D — Pipeline Fotogrammetrie & Reconstrucție 3D</title>
+  
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Model Viewer (3D WebGL / WebXR / AR) -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #171d2c 0%, #0a0d14 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    .glass-panel {
+      background: rgba(18, 24, 38, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    .glass-card {
+      background: rgba(25, 33, 50, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.2s ease;
+    }
+    .glass-card:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      --poster-color: transparent;
+      outline: none;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
+    .glow-indigo {
+      box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.4);
+    }
+  </style>
+</head>
+<body class="p-3 md:p-6 pb-20">
+
+  <!-- Top Navigation / Header -->
+  <header class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+        <i data-lucide="box" class="w-6 h-6 text-white"></i>
+      </div>
+      <div>
+        <h1 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
+          OmniScan 3D
+        </h1>
+        <p class="text-xs text-slate-400">Pipeline Hibrid de Fotogrammetrie & Georeferențiere</p>
+      </div>
+    </div>
+
+    <!-- System Badge -->
+    <div id="system-badge" class="flex items-center gap-2 px-3 py-1.5 rounded-full glass-card text-xs font-mono text-slate-300">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span id="gpu-text">NVIDIA RTX 4050 (CUDA 13.3)</span>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Column: Upload & Controls (5 Cols) -->
+    <section class="lg:col-span-5 flex flex-col gap-6">
+      
+      <!-- New Scan Card -->
+      <div class="glass-panel rounded-2xl p-5 md:p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base md:text-lg font-semibold flex items-center gap-2 text-white">
+            <i data-lucide="camera" class="w-5 h-5 text-indigo-400"></i> Proiect Nou de Scanare
+          </h2>
+          <span class="text-xs text-slate-400 font-mono">Mobile / PC</span>
+        </div>
+
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Selectează 30–120 fotografii realizate în cerc (suprapunere 70-80%) sau încarcă direct o arhivă <span class="font-mono text-indigo-300">.zip</span>.
+        </p>
+
+        <!-- Drag & Drop / File Input -->
+        <div 
+          id="dropzone"
+          class="border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-xl p-6 text-center cursor-pointer transition-all duration-200 bg-slate-900/30 flex flex-col items-center justify-center gap-3"
+          onclick="document.getElementById('file-input').click()"
+        >
+          <div class="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+            <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-slate-200">Apasă pentru poze sau trage fișierele aici</p>
+            <p class="text-xs text-slate-500 mt-1">Acceptă JPG, PNG sau fișier .ZIP</p>
+          </div>
+          <input type="file" id="file-input" multiple accept="image/*,.zip" class="hidden" onchange="handleFileSelect(event)">
+        </div>
+
+        <!-- Selected Files Info -->
+        <div id="file-info-box" class="hidden p-3 rounded-lg bg-indigo-950/40 border border-indigo-500/30 text-xs flex items-center justify-between">
+          <div class="flex items-center gap-2 truncate">
+            <i data-lucide="file-check" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+            <span id="file-info-text" class="text-slate-200 truncate"></span>
+          </div>
+          <button onclick="clearSelectedFiles()" class="text-slate-400 hover:text-red-400 ml-2">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Project Settings -->
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div>
+            <label class="block text-slate-400 mb-1">Nume Proiect</label>
+            <input 
+              type="text" 
+              id="project-name" 
+              placeholder="Ex: Statuie_Parc" 
+              class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+            >
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Calitate Reconstrucție</label>
+            <select id="quality-select" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+              <option value="medium">Standard (Rapid)</option>
+              <option value="high">Înaltă (Max SIFT)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <button 
+          id="btn-process" 
+          onclick="startUploadAndProcess()" 
+          disabled
+          class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        >
+          <i data-lucide="play" class="w-4 h-4"></i> Pornește Reconstrucția 3D
+        </button>
+
+      </div>
+
+      <!-- Live Progress Card -->
+      <div id="progress-card" class="hidden glass-panel rounded-2xl p-5 md:p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            <i data-lucide="cpu" class="w-4 h-4 text-indigo-400 animate-spin"></i> Stadiu Procesare
+          </h3>
+          <span id="progress-percent" class="text-xs font-mono font-bold text-indigo-400">0%</span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+          <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 to-cyan-400 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+
+        <p id="progress-msg" class="text-xs text-slate-300 font-mono leading-relaxed">
+          Inițializare pipeline...
+        </p>
+
+        <!-- Pipeline Stages Indicator -->
+        <div class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-800 text-[10px] text-center font-mono text-slate-400">
+          <div id="stage-exif" class="p-1 rounded bg-slate-900/50">1. EXIF/GPS</div>
+          <div id="stage-sift" class="p-1 rounded bg-slate-900/50">2. SIFT/SfM</div>
+          <div id="stage-mesh" class="p-1 rounded bg-slate-900/50">3. Mesh TIN</div>
+          <div id="stage-glb" class="p-1 rounded bg-slate-900/50">4. Export 3D</div>
+        </div>
+      </div>
+
+      <!-- Existing Projects List -->
+      <div class="glass-panel rounded-2xl p-5 md:p-6 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            <i data-lucide="folder" class="w-4 h-4 text-indigo-400"></i> Proiecte Salvate
+          </h3>
+          <button onclick="loadProjects()" class="text-xs text-slate-400 hover:text-white">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+        <div id="projects-list" class="flex flex-col gap-2 max-h-60 overflow-y-auto pr-1">
+          <p class="text-xs text-slate-500 py-2">Se încarcă proiectele...</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Right Column: Interactive 3D Viewer & Metrics (7 Cols) -->
+    <section class="lg:col-span-7 flex flex-col gap-6">
+
+      <!-- 3D Canvas Card -->
+      <div class="glass-panel rounded-2xl p-4 md:p-6 flex flex-col gap-4 relative min-h-[480px] lg:min-h-[560px]">
+        
+        <!-- Viewer Header -->
+        <div class="flex items-center justify-between z-10">
+          <div>
+            <h2 id="viewer-title" class="text-base font-semibold text-white flex items-center gap-2">
+              <i data-lucide="view" class="w-4 h-4 text-cyan-400"></i> Vizualizator 3D Interactiv
+            </h2>
+            <p id="viewer-subtitle" class="text-xs text-slate-400 font-mono">Alege un model sau încarcă poze noi</p>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="flex items-center gap-2">
+            <button 
+              id="btn-ar" 
+              class="hidden px-2.5 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white text-xs font-mono flex items-center gap-1.5 transition-all"
+              onclick="triggerAR()"
+            >
+              <i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Vezi în AR
+            </button>
+            <button 
+              id="btn-fullscreen" 
+              class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs"
+              onclick="toggleFullscreen()"
+              title="Ecran complet"
+            >
+              <i data-lucide="maximize" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3D Viewer Container -->
+        <div id="viewer-container" class="relative flex-1 w-full h-full rounded-xl overflow-hidden bg-slate-950/60 border border-slate-800 flex items-center justify-center">
+          
+          <!-- Empty State -->
+          <div id="empty-state" class="flex flex-col items-center justify-center p-6 text-center gap-3">
+            <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500">
+              <i data-lucide="cube" class="w-8 h-8"></i>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-slate-300">Niciun model încărcat</p>
+              <p class="text-xs text-slate-500 mt-1">Rulează o scanare sau selectează un proiect din lista din stânga</p>
+            </div>
+          </div>
+
+          <!-- Google Model Viewer -->
+          <model-viewer
+            id="model-viewer-elem"
+            class="hidden"
+            camera-controls
+            auto-rotate
+            rotation-per-second="15deg"
+            shadow-intensity="1.5"
+            shadow-softness="0.8"
+            exposure="1.0"
+            ar
+            ar-modes="webxr scene-viewer quick-look"
+            loading="lazy"
+          >
+          </model-viewer>
+
+        </div>
+
+        <!-- Viewer Toolbar & Downloads -->
+        <div id="viewer-toolbar" class="hidden flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800 text-xs">
+          <!-- Model Controls -->
+          <div class="flex items-center gap-2">
+            <button onclick="toggleAutoRotate()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] flex items-center gap-1">
+              <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Rotație Auto
+            </button>
+            <button onclick="resetCamera()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] flex items-center gap-1">
+              <i data-lucide="focus" class="w-3.5 h-3.5"></i> Reset Cameră
+            </button>
+          </div>
+
+          <!-- Download Buttons -->
+          <div class="flex items-center gap-2">
+            <a id="download-glb" href="#" download class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-[11px] flex items-center gap-1">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i> .GLB (3D)
+            </a>
+            <a id="download-obj" href="#" download class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] flex items-center gap-1">
+              .OBJ
+            </a>
+            <a id="download-ply" href="#" download class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] flex items-center gap-1">
+              .PLY
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Spatial & Metadata Details Card -->
+      <div id="meta-card" class="hidden glass-panel rounded-2xl p-5 md:p-6 flex flex-col gap-4">
+        <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+          <i data-lucide="map-pin" class="w-4 h-4 text-emerald-400"></i> Metrici & Georeferențiere GPS
+        </h3>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono text-xs">
+          <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+            <p class="text-slate-500 text-[10px]">Cadre Aliniate</p>
+            <p id="stat-cameras" class="text-slate-200 font-bold mt-1">-</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+            <p class="text-slate-500 text-[10px]">Puncte 3D</p>
+            <p id="stat-points" class="text-slate-200 font-bold mt-1">-</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+            <p class="text-slate-500 text-[10px]">Poligoane (Mesh)</p>
+            <p id="stat-triangles" class="text-slate-200 font-bold mt-1">-</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+            <p class="text-slate-500 text-[10px]">Timp Calcul</p>
+            <p id="stat-time" class="text-slate-200 font-bold mt-1">-</p>
+          </div>
+        </div>
+
+        <div id="gps-info-row" class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/20 text-xs font-mono flex flex-col md:flex-row md:items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <i data-lucide="globe" class="w-4 h-4 text-emerald-400"></i>
+            <span class="text-slate-300">Coordonate Centroid: <strong id="gps-coords" class="text-emerald-400">-</strong></span>
+          </div>
+          <span id="gps-alt" class="text-slate-400">Altitudine: -</span>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    let selectedFiles = [];
+    let currentProjectId = null;
+    let pollInterval = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      fetchSystemStatus();
+      loadProjects();
+    });
+
+    async function fetchSystemStatus() {
+      try {
+        const res = await fetch("/api/system");
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById("gpu-text").innerText = `${data.gpu}`;
+        }
+      } catch (e) {
+        console.warn("Could not fetch system stats", e);
+      }
+    }
+
+    function handleFileSelect(event) {
+      selectedFiles = Array.from(event.target.files);
+      updateSelectedFilesUI();
+    }
+
+    function updateSelectedFilesUI() {
+      const box = document.getElementById("file-info-box");
+      const text = document.getElementById("file-info-text");
+      const btn = document.getElementById("btn-process");
+
+      if (selectedFiles.length > 0) {
+        box.classList.remove("hidden");
+        text.innerText = selectedFiles.length === 1 && selectedFiles[0].name.endsWith(".zip")
+          ? `Arhivă selectată: ${selectedFiles[0].name}`
+          : `${selectedFiles.length} fotografii selectate`;
+        btn.disabled = false;
+      } else {
+        box.classList.add("hidden");
+        btn.disabled = true;
+      }
+      lucide.createIcons();
+    }
+
+    function clearSelectedFiles() {
+      selectedFiles = [];
+      document.getElementById("file-input").value = "";
+      updateSelectedFilesUI();
+    }
+
+    async function startUploadAndProcess() {
+      if (selectedFiles.length === 0) return;
+
+      const btn = document.getElementById("btn-process");
+      const progressCard = document.getElementById("progress-card");
+      const projName = document.getElementById("project-name").value;
+      const quality = document.getElementById("quality-select").value;
+
+      btn.disabled = true;
+      progressCard.classList.remove("hidden");
+      updateProgressBar(5, "Se încarcă fotografiile pe server...");
+
+      const formData = new FormData();
+      if (projName) formData.append("project_name", projName);
+
+      if (selectedFiles.length === 1 && selectedFiles[0].name.endsWith(".zip")) {
+        formData.append("zip_file", selectedFiles[0]);
+      } else {
+        selectedFiles.forEach(f => formData.append("files", f));
+      }
+
+      try {
+        const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
+        if (!uploadRes.ok) throw new Error("Upload eșuat.");
+        const uploadData = await uploadRes.json();
+        currentProjectId = uploadData.project_id;
+
+        updateProgressBar(15, `Încărcat cu succes (${uploadData.image_count} imagini). Se pornește GPU...`);
+
+        // Trigger processing
+        await fetch(`/api/process/${currentProjectId}?quality=${quality}`, { method: "POST" });
+        
+        // Start polling progress
+        startProgressPolling(currentProjectId);
+
+      } catch (err) {
+        alert("Eroare la procesare: " + err.message);
+        btn.disabled = false;
+      }
+    }
+
+    function startProgressPolling(projectId) {
+      if (pollInterval) clearInterval(pollInterval);
+
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/progress/${projectId}`);
+          if (!res.ok) return;
+          const data = await res.json();
+
+          updateProgressBar(data.percent, data.message);
+          highlightStage(data.stage);
+
+          if (data.stage === "completed") {
+            clearInterval(pollInterval);
+            document.getElementById("btn-process").disabled = false;
+            loadModelInViewer(projectId, data.result);
+            loadProjects();
+          } else if (data.stage === "failed") {
+            clearInterval(pollInterval);
+            document.getElementById("btn-process").disabled = false;
+            alert("Procesarea a întâmpinat o eroare: " + data.message);
+          }
+        } catch (e) {
+          console.error("Progress polling error", e);
+        }
+      }, 1000);
+    }
+
+    function updateProgressBar(percent, msg) {
+      document.getElementById("progress-bar").style.width = `${percent}%`;
+      document.getElementById("progress-percent").innerText = `${Math.round(percent)}%`;
+      document.getElementById("progress-msg").innerText = msg;
+    }
+
+    function highlightStage(stage) {
+      const stages = ["exif", "sift", "mesh", "glb"];
+      stages.forEach(s => {
+        const el = document.getElementById(`stage-${s}`);
+        if (el) el.className = "p-1 rounded bg-slate-900/50 text-slate-500";
+      });
+
+      if (stage === "exif") document.getElementById("stage-exif").className = "p-1 rounded bg-indigo-900/80 text-indigo-300 font-bold";
+      if (stage === "features" || stage === "matching" || stage === "sfm") document.getElementById("stage-sift").className = "p-1 rounded bg-indigo-900/80 text-indigo-300 font-bold";
+      if (stage === "meshing") document.getElementById("stage-mesh").className = "p-1 rounded bg-indigo-900/80 text-indigo-300 font-bold";
+      if (stage === "export" || stage === "completed") document.getElementById("stage-glb").className = "p-1 rounded bg-emerald-900/80 text-emerald-300 font-bold";
+    }
+
+    async function loadProjects() {
+      try {
+        const res = await fetch("/api/projects");
+        if (!res.ok) return;
+        const list = await res.json();
+        const container = document.getElementById("projects-list");
+        container.innerHTML = "";
+
+        if (list.length === 0) {
+          container.innerHTML = `<p class="text-xs text-slate-500 py-2">Nu există scanări anterioare.</p>`;
+          return;
+        }
+
+        list.forEach(p => {
+          const item = document.createElement("div");
+          item.className = "p-3 rounded-xl glass-card flex items-center justify-between cursor-pointer";
+          item.onclick = () => selectProject(p);
+
+          item.innerHTML = `
+            <div class="flex items-center gap-2.5 truncate">
+              <div class="w-8 h-8 rounded-lg bg-indigo-900/40 flex items-center justify-center text-indigo-400 shrink-0">
+                <i data-lucide="box" class="w-4 h-4"></i>
+              </div>
+              <div class="truncate">
+                <p class="text-xs font-semibold text-slate-200 truncate">${p.project_id}</p>
+                <p class="text-[10px] text-slate-400 font-mono">${p.image_count} imagini • ${p.has_model ? 'Model Gata' : 'În curs'}</p>
+              </div>
+            </div>
+            ${p.has_model ? '<i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>' : ''}
+          `;
+          container.appendChild(item);
+        });
+        lucide.createIcons();
+      } catch (e) {
+        console.error("Failed to load projects", e);
+      }
+    }
+
+    function selectProject(proj) {
+      if (proj.has_model) {
+        loadModelInViewer(proj.project_id, proj.summary, proj.geo);
+      }
+    }
+
+    function loadModelInViewer(projectId, summary = null, geo = null) {
+      const viewer = document.getElementById("model-viewer-elem");
+      const empty = document.getElementById("empty-state");
+      const toolbar = document.getElementById("viewer-toolbar");
+      const metaCard = document.getElementById("meta-card");
+      const arBtn = document.getElementById("btn-ar");
+
+      document.getElementById("viewer-title").innerText = projectId;
+      document.getElementById("viewer-subtitle").innerText = "Model 3D Interactiv (Format GLB)";
+
+      const glbUrl = `/api/models/${projectId}/model.glb`;
+      viewer.src = glbUrl;
+
+      empty.classList.add("hidden");
+      viewer.classList.remove("hidden");
+      toolbar.classList.remove("hidden");
+      metaCard.classList.remove("hidden");
+      arBtn.classList.remove("hidden");
+
+      // Setup downloads
+      document.getElementById("download-glb").href = `/api/models/${projectId}/model.glb`;
+      document.getElementById("download-obj").href = `/api/models/${projectId}/model.obj`;
+      document.getElementById("download-ply").href = `/api/models/${projectId}/dense_cloud.ply`;
+
+      // Update metrics if available
+      if (summary && summary.metrics) {
+        document.getElementById("stat-cameras").innerText = `${summary.metrics.registered_images}/${summary.metrics.total_images}`;
+        document.getElementById("stat-points").innerText = summary.metrics.reconstructed_points.toLocaleString();
+        document.getElementById("stat-triangles").innerText = summary.metrics.mesh_triangles.toLocaleString();
+        document.getElementById("stat-time").innerText = `${summary.elapsed_seconds}s`;
+      }
+
+      if (geo && geo.center) {
+        document.getElementById("gps-coords").innerText = `${geo.center.latitude.toFixed(5)}° N, ${geo.center.longitude.toFixed(5)}° E`;
+        document.getElementById("gps-alt").innerText = `Altitudine: ${geo.center.altitude}m`;
+      }
+
+      lucide.createIcons();
+    }
+
+    function toggleAutoRotate() {
+      const v = document.getElementById("model-viewer-elem");
+      v.autoRotate = !v.autoRotate;
+    }
+
+    function resetCamera() {
+      const v = document.getElementById("model-viewer-elem");
+      v.cameraOrbit = "0deg 75deg 105%";
+    }
+
+    function triggerAR() {
+      const v = document.getElementById("model-viewer-elem");
+      if (v.canActivateAR) {
+        v.activateAR();
+      } else {
+        alert("Modul AR este disponibil la deschiderea paginii de pe un telefon compatibil Android sau iOS.");
+      }
+    }
+
+    function toggleFullscreen() {
+      const elem = document.getElementById("viewer-container");
+      if (!document.fullscreenElement) {
+        elem.requestFullscreen().catch(err => alert(err.message));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+  </script>
+</body>
+</html>
