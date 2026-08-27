@@ -90,7 +90,7 @@ You can interact with the generated 3D model and calibrated camera trajectory di
 
 ### 1. Camera Projection & Radial Distortion Model (`SIMPLE_RADIAL`)
 
-For each 3D point $\mathbf{X}_w \in \mathbb{R}^3$, the world-to-camera transformation with rotation matrix $\mathbf{R} \in \mathrm{SO}(3)$ and translation vector $\mathbf{t} \in \mathbb{R}^3$ yields camera coordinates $\mathbf{X}_c = [X_c, Y_c, Z_c]^T$:
+For each 3D point $\mathbf{X}_w \in \mathbb{R}^3$, the world-to-camera transformation with rotation matrix $\mathbf{R} \in \text{SO}(3)$ and translation vector $\mathbf{t} \in \mathbb{R}^3$ yields camera coordinates $\mathbf{X}_c = [X_c, Y_c, Z_c]^T$:
 
 $$\mathbf{X}_c = \mathbf{R} \mathbf{X}_w + \mathbf{t}$$
 
@@ -110,7 +110,7 @@ $$v = f \cdot y_n (1 + k_1 r^2) + c_y$$
 
 To estimate the 3D focal convergence center $\mathbf{p}^*$ of $N$ calibrated camera rays with centers $\mathbf{C}_i$ and normalized optical axis unit vectors $\mathbf{v}_i$:
 
-$$\mathbf{p}^* = \operatorname{arg\,min}_{\mathbf{p}} \sum_{i=1}^N \| (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T)(\mathbf{p} - \mathbf{C}_i) \|^2$$
+$$\mathbf{p}^* = \arg\min_{\mathbf{p}} \sum_{i=1}^N \| (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T)(\mathbf{p} - \mathbf{C}_i) \|^2$$
 
 Solving the resulting symmetric linear system $\mathbf{A} \mathbf{p}^* = \mathbf{b}$:
 
@@ -286,7 +286,7 @@ Modelul 3D și traiectoria celor 59 de camere pot fi explorate direct în browse
 
 ### 1. Calibrarea Camerei și Distorsiunea Radială (`SIMPLE_RADIAL`)
 
-Pentru fiecare punct 3D din spațiul lumii $\mathbf{X}_w \in \mathbb{R}^3$, transformarea în coordonatele camerei $\mathbf{X}_c = [X_c, Y_c, Z_c]^T$ folosind matricea de rotație $\mathbf{R} \in \mathrm{SO}(3)$ și vectorul de translație $\mathbf{t} \in \mathbb{R}^3$:
+Pentru fiecare punct 3D din spațiul lumii $\mathbf{X}_w \in \mathbb{R}^3$, transformarea în coordonatele camerei $\mathbf{X}_c = [X_c, Y_c, Z_c]^T$ folosind matricea de rotație $\mathbf{R} \in \text{SO}(3)$ și vectorul de translație $\mathbf{t} \in \mathbb{R}^3$:
 
 $$\mathbf{X}_c = \mathbf{R} \mathbf{X}_w + \mathbf{t}$$
 
@@ -306,7 +306,7 @@ $$v = f \cdot y_n (1 + k_1 r^2) + c_y$$
 
 Pentru a estima centrul de focalizare 3D $\mathbf{p}^*$ al celor $N$ raze de cameră calibrate cu centrele $\mathbf{C}_i$ și vectorii direcționali unitari normalizați $\mathbf{v}_i$:
 
-$$\mathbf{p}^* = \operatorname{arg\,min}_{\mathbf{p}} \sum_{i=1}^N \| (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T)(\mathbf{p} - \mathbf{C}_i) \|^2$$
+$$\mathbf{p}^* = \arg\min_{\mathbf{p}} \sum_{i=1}^N \| (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T)(\mathbf{p} - \mathbf{C}_i) \|^2$$
 
 Rezolvând sistemul liniar simetric $\mathbf{A} \mathbf{p}^* = \mathbf{b}$:
 
