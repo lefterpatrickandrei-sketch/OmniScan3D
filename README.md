@@ -1,5 +1,7 @@
 ﻿# OmniScan 3D — Photogrammetry, Geometric Synthesis & PBR Reconstruction
 
+[🇬🇧 English Version](README.md) | [🇷🇴 Versiunea în Română](README_RO.md)
+
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![CUDA 13+](https://img.shields.io/badge/CUDA-13.3-76B900?style=flat&logo=nvidia&logoColor=white)](https://developer.nvidia.com/cuda-toolkit)
 [![PyCOLMAP 4.1+](https://img.shields.io/badge/PyCOLMAP-4.1.1-blue?style=flat)](https://github.com/colmap/pycolmap)
