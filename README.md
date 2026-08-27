@@ -1,4 +1,4 @@
-# OmniScan 3D — Photogrammetry, Geometric Synthesis & PBR Reconstruction
+# OmniScan 3D — Field Photogrammetry & 3D Reporting Tool
 
 > ### 🌐 [👉 Click Here to Open the Live 3D Interactive Viewer & AR / Deschide Vizualizatorul 3D Live](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/) 👈
 > **Live Demo & AR:** [https://lefterpatrickandrei-sketch.github.io/OmniScan3D/](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/)  
@@ -20,7 +20,9 @@
 
 # 🇬🇧 English Version
 
-**OmniScan 3D** is an end-to-end photogrammetry, computer vision, and PBR 3D asset generation engine designed for challenging physical objects (including non-Lambertian, textureless, and dark cylindrical geometries). It integrates camera bundle adjustment, RANSAC plane calibration, macro-chart texture baking, and an autonomous **NVIDIA NIM Vision AI** self-evaluation feedback loop.
+> **OmniScan 3D is simply a practical field tool designed to assist surveying and field engineers in quickly collecting on-site data and generating clear, interactive 3D visual and geometric reports for clients and project documentation.**
+
+It provides a lightweight, local workflow (running directly on a field laptop with GPU, with zero cloud dependency) that turns overlapping photographs into calibrated, georeferenced 3D models with interactive 360° web viewing and augmented reality support.
 
 ---
 
@@ -35,7 +37,7 @@ You can interact with the generated 3D model and calibrated camera trajectory di
 - Toggle **59 3D Camera Frustums / Pyramids** around the object
 - Click on any camera angle to view the original photo, distance, and GPS coordinates
 - Augmented Reality (AR / WebXR) on mobile devices
-- Export `.GLB`, `.OBJ`, and `.PLY` models
+- Export `.GLB`, `.OBJ`, and `.PLY` models for reporting and CAD/GIS integration
 
 ---
 
@@ -216,7 +218,9 @@ Open **`http://localhost:8000`** in your browser.
 
 > ### 🌐 [👉 Deschide Vizualizatorul 3D Interactiv & AR în Browser](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/) 👈
 
-**OmniScan 3D** este un motor complet de fotogrammetrie, viziune computațională și generare de asset-uri 3D PBR, conceput special pentru obiecte fizice dificile (suprafețe non-lambertiene, fără textură contrastantă sau geometrii cilindrice negre). Sistemul integrează calibrare bundle adjustment, detectare de plan RANSAC, sinteză de textură PBR pe macro-diagrame fără cusături și o buclă de auto-evaluare vizuală bazată pe **NVIDIA NIM Vision AI**.
+> **OmniScan 3D este pur și simplu un instrument practic de lucru, conceput pentru a ajuta inginerul să colecteze rapid date din teren și să genereze rapoarte 3D clare, vizuale și documentate pentru clienți și proiecte.**
+
+Oferă un flux de lucru complet local (care rulează direct pe laptopul de teren dotat cu GPU, fără a depinde de cloud sau conexiune la internet) ce transformă fotografiile de pe șantier în modele 3D calibrate, georeferențiate, ușor de inspectat în browser și în Realitate Augmentată (AR).
 
 ---
 
