@@ -5,10 +5,9 @@
 > **📦 Download Release (.ZIP):** [GitHub Releases v1.0.0](https://github.com/lefterpatrickandrei-sketch/OmniScan3D/releases/tag/v1.0.0)
 
 [![Live 3D Demo](https://img.shields.io/badge/Live%203D%20Demo-GitHub%20Pages-blue?style=for-the-badge&logo=googlechrome&logoColor=white)](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/)
+[![Lightweight Hardware](https://img.shields.io/badge/Hardware-Any%20Laptop%20%2F%20Low%20Spec-orange?style=for-the-badge)](https://github.com/lefterpatrickandrei-sketch/OmniScan3D)
+[![NVIDIA NIM API](https://img.shields.io/badge/AI%20Vision-NVIDIA%20NIM%20API-green?style=for-the-badge)](https://developer.nvidia.com/nim)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![CUDA 13+](https://img.shields.io/badge/CUDA-13.3-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://developer.nvidia.com/cuda-toolkit)
-[![PyCOLMAP 4.1+](https://img.shields.io/badge/PyCOLMAP-4.1.1-blue?style=for-the-badge)](https://github.com/colmap/pycolmap)
-[![NVIDIA NIM](https://img.shields.io/badge/NVIDIA%20NIM-VLM%20Evaluator-green?style=for-the-badge)](https://developer.nvidia.com/nim)
 
 ---
 
@@ -22,7 +21,10 @@
 
 > **OmniScan 3D is simply a practical field tool designed to assist surveying and field engineers in quickly collecting on-site data and generating clear, interactive 3D visual and geometric reports for clients and project documentation.**
 
-It provides a lightweight, local workflow (running directly on a field laptop with GPU, with zero cloud dependency) that turns overlapping photographs into calibrated, georeferenced 3D models with interactive 360° web viewing and augmented reality support.
+### 💡 Low Hardware Requirements & Cloud API Architecture
+* **No Expensive Workstation Needed:** The heavy AI vision analysis and evaluation loop runs remotely via **NVIDIA NIM Cloud APIs** (`meta/llama-3.2-11b-vision-instruct`), eliminating the need for bulky, multi-thousand-dollar GPU rigs in the field.
+* **Runs on Standard Laptops:** The local photogrammetry and geometric pipeline is optimized to run efficiently on ordinary field laptops, ultrabooks, or mini-PCs.
+* **Instant Client Delivery:** 3D models are rendered natively in the browser using WebGL / `<model-viewer>`, opening smoothly on any office PC, tablet, or smartphone without requiring specialized CAD software.
 
 ---
 
@@ -55,7 +57,7 @@ You can interact with the generated 3D model and calibrated camera trajectory di
                                       ▼
                ┌──────────────────────────────────────────────┐
                │ Stage 2: SIFT / PyCOLMAP Camera Calibration   │
-               │ Incremental SfM Bundle Adjustment (59 views) │
+               │ Lightweight local SfM (59 views in seconds)  │
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
@@ -78,8 +80,8 @@ You can interact with the generated 3D model and calibrated camera trajectory di
                                       │
                                       ▼
                ┌──────────────────────────────────────────────┐
-               │ Stage 6: NVIDIA NIM Vision AI Critic Loop    │
-               │ Autonomous rendering review & auto-tuning    │
+               │ Stage 6: NVIDIA NIM Vision Cloud API Loop    │
+               │ Remote AI critique (No local VRAM needed)    │
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
@@ -195,6 +197,7 @@ $$\mathbf{N}_{\text{PBR}} = \left[ \frac{1}{2}\left(\frac{\mathbf{N}}{\|\mathbf{
 | **Mesh Triangles** | 11,720 |
 | **Texture Atlas** | 2048 × 1024 (PBR Albedo + Normal Map) |
 | **Watertight Solid** | Yes (`is_watertight = True`) |
+| **Hardware Footprint** | Standard Laptop / Low Resource (API-assisted) |
 | **Output Formats** | `.GLB` (Web 3D/AR), `.OBJ` (CAD), `.PLY` (Point Cloud) |
 | **Inference Time** | ~14.2 seconds |
 
@@ -220,7 +223,10 @@ Open **`http://localhost:8000`** in your browser.
 
 > **OmniScan 3D este pur și simplu un instrument practic de lucru, conceput pentru a ajuta inginerul să colecteze rapid date din teren și să genereze rapoarte 3D clare, vizuale și documentate pentru clienți și proiecte.**
 
-Oferă un flux de lucru complet local (care rulează direct pe laptopul de teren dotat cu GPU, fără a depinde de cloud sau conexiune la internet) ce transformă fotografiile de pe șantier în modele 3D calibrate, georeferențiate, ușor de inspectat în browser și în Realitate Augmentată (AR).
+### 💡 Cerințe Hardware Reduse & Procesare prin API
+* **Nu este nevoie de calculatoare scumpe de mii de euro:** Evaluarea vizuală inteligentă și analiza imaginilor se realizează prin **NVIDIA NIM Cloud API** (`meta/llama-3.2-11b-vision-instruct`), fără a consuma memoria video (VRAM) a laptopului de teren.
+* **Rulează pe laptopuri obișnuite:** Calibrarea fotogrammetrică locală este optimizată să ruleze rapid pe orice laptop sau mini-PC standard.
+* **Livrare imediată către client:** Vizualizarea 3D se face direct în browser prin WebGL / `<model-viewer>`, deschizându-se instantaneu pe orice telefon, tabletă sau calculator de birou, fără a necesita programe CAD instalate.
 
 ---
 
@@ -253,7 +259,7 @@ Modelul 3D și traiectoria celor 59 de camere pot fi explorate direct în browse
                                       ▼
                ┌──────────────────────────────────────────────┐
                │ Etapa 2: Calibrare Camere SIFT / PyCOLMAP    │
-               │ SfM Incremental & Bundle Adjustment (59 cadre│
+               │ SfM local ușor (59 cadre în câteva secunde)  │
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
@@ -276,8 +282,8 @@ Modelul 3D și traiectoria celor 59 de camere pot fi explorate direct în browse
                                       │
                                       ▼
                ┌──────────────────────────────────────────────┐
-               │ Etapa 6: Buclă de Critică NVIDIA NIM AI      │
-               │ Randare preview, analiză defecte & optimizare│
+               │ Etapa 6: Buclă de Critică NVIDIA NIM API     │
+               │ Analiză AI prin Cloud (Zero consum VRAM local│
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
@@ -377,6 +383,7 @@ $$\mathbf{N}_{\text{PBR}} = \left[ \frac{1}{2}\left(\frac{\mathbf{N}}{\|\mathbf{
 | **Vârfuri Mesh** | 5,954 |
 | **Triunghiuri** | 11,720 |
 | **Atlas Textură** | 2048 × 1024 PBR |
+| **Cerințe Hardware** | Laptop obișnuit / Consum redus (Asistat prin API) |
 | **Solid Watertight** | Da (`is_watertight = True`) |
 | **Timp Reconstrucție** | ~14.2 secunde |
 
