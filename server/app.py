@@ -227,10 +227,12 @@ def get_model_file(project_id: str, filename: str):
     """Serves model assets (.glb, .obj, .ply, .json)."""
     file_path = PROJECTS_DIR / project_id / "output" / filename
     if not file_path.exists():
-        # Check images if requesting sample thumbnail
-        img_path = PROJECTS_DIR / project_id / "images" / filename
+        # Check prepared_images and images if requesting sample thumbnail
+        img_path = PROJECTS_DIR / project_id / "prepared_images" / filename
+        if not img_path.exists():
+            img_path = PROJECTS_DIR / project_id / "images" / filename
         if img_path.exists():
-            return FileResponse(img_path)
+            return FileResponse(img_path, media_type="image/jpeg")
         raise HTTPException(status_code=404, detail="File not found.")
     
     media_types = {

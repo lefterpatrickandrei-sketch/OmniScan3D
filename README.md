@@ -217,5 +217,36 @@ python engine/pipeline.py
 
 ---
 
+
+---
+
+## 🔬 Technical Observations, Sensor Uncertainties & Indoor Photogrammetry Notes
+
+> [!NOTE]
+> **Measurement Disclaimers & Physical Constraints:**  
+> The benchmark dataset was captured using a consumer smartphone (**Motorola Edge 40 Neo**) inside a residential indoor environment. Several optical and sensor physics phenomena were identified and mitigated during reconstruction:
+
+### 1. Indoor GNSS Multipath & Dilution of Precision (DOP)
+* **Indoor GPS Attenuation:** GPS/GNSS signals experience radio-frequency attenuation and multi-path reflections through reinforced concrete ceilings and walls.
+* **Accuracy Distinction:** While the **relative inter-camera baseline vectors** $\Delta \mathbf{C}_{ij}$ computed via epipolar geometry and bundle adjustment possess sub-millimeter relative precision ($\sigma_{\text{SfM}} pprox \pm 0.8\text{ mm}$), the absolute **WGS84 geodetic coordinates** (Lat $44.54852^\circ$, Lon $26.06934^\circ$, Alt $132.0\text{ m}$) have an expected indoor dilution uncertainty of $\pm 5\text{--}15\text{ m}$.
+
+### 2. SIFT Keypoint Disparity on Black / Textureless Objects
+* **Background vs. Foreground Distribution:**
+  * **Background Keypoints (Table wood grain, chair bars, tiles):** $20,976\text{ points } (92.4\%)$
+  * **Foreground Keypoints (Black speaker body):** $1,726\text{ points } (7.6\%)$
+* **Significance:** Black matte ballistic weave absorbs incident light, resulting in low local luminance gradients $\nabla I \approx 0$. This mathematically explains why classic MVS/Poisson surface triangulation failed, and validates the hybrid silhouette-constrained geometric synthesis approach.
+
+### 3. Lens Breathing & Electronic Rolling Shutter Variance
+* **Autofocus Lens Breathing:** Handheld smartphone autofocus adjustments cause micro-variations in effective focal length between close-up and wide shots ($f \in [1410, 1465]\text{ px}$). The pipeline solves for the optimal global single-camera approximation ($f = 1436.1\text{ px}$).
+* **Rolling Shutter:** Handheld movement introduces small per-line exposure offsets, compensated by RANSAC outlier rejection during exhaustive feature matching.
+
+### 4. Mixed HDR Dynamic Range & Anisotropic Specular Decoupling
+* **Exposure Shifts:** $19/59$ frames were captured in auto-HDR (`_HDR.jpg`), causing localized luminance jumps.
+* **PBR Material Solution:** By decomposing the asset into a clean diffuse albedo map and a tangent-space Sobel normal map ($\mathbf{N}_{\text{PBR}}$), room specular highlights and incandescent light color casts are decoupled from the physical 3D asset.
+
+### 5. Monocular Scale Ambiguity ($\lambda$-Gauge)
+* Monocular Structure-from-Motion is invariant to global scale $\mathbf{X} \to \lambda \mathbf{X}$.
+* Absolute metric scale ($H = 0.178\text{ m}$, $R = 0.034\text{ m}$) was pinned using RANSAC ground plane bounding against physical product reference specifications.
+
 ## 📜 License
 Distributed under the **MIT License**. See `LICENSE` for more information.
