@@ -1,24 +1,41 @@
-﻿# OmniScan 3D — Photogrammetry, Geometric Synthesis & PBR Reconstruction
+# OmniScan 3D — Photogrammetry, Geometric Synthesis & PBR Reconstruction
 
-[🇬🇧 English Version](README.md) | [🇷🇴 Versiunea în Română](README_RO.md)
+> ### 🌐 [👉 Click Here to Open the Live 3D Interactive Viewer & AR / Deschide Vizualizatorul 3D Live](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/) 👈
+> **Live Demo & AR:** [https://lefterpatrickandrei-sketch.github.io/OmniScan3D/](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/)  
+> **📦 Download Release (.ZIP):** [GitHub Releases v1.0.0](https://github.com/lefterpatrickandrei-sketch/OmniScan3D/releases/tag/v1.0.0)
 
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![CUDA 13+](https://img.shields.io/badge/CUDA-13.3-76B900?style=flat&logo=nvidia&logoColor=white)](https://developer.nvidia.com/cuda-toolkit)
-[![PyCOLMAP 4.1+](https://img.shields.io/badge/PyCOLMAP-4.1.1-blue?style=flat)](https://github.com/colmap/pycolmap)
-[![Three.js](https://img.shields.io/badge/Three.js-r128-black?style=flat&logo=three.js)](https://threejs.org/)
-[![NVIDIA NIM](https://img.shields.io/badge/NVIDIA%20NIM-VLM%20Evaluator-green)](https://developer.nvidia.com/nim)
+[![Live 3D Demo](https://img.shields.io/badge/Live%203D%20Demo-GitHub%20Pages-blue?style=for-the-badge&logo=googlechrome&logoColor=white)](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![CUDA 13+](https://img.shields.io/badge/CUDA-13.3-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://developer.nvidia.com/cuda-toolkit)
+[![PyCOLMAP 4.1+](https://img.shields.io/badge/PyCOLMAP-4.1.1-blue?style=for-the-badge)](https://github.com/colmap/pycolmap)
+[![NVIDIA NIM](https://img.shields.io/badge/NVIDIA%20NIM-VLM%20Evaluator-green?style=for-the-badge)](https://developer.nvidia.com/nim)
+
+---
+
+## 📑 Language Selection / Selectare Limbă
+* 🇬🇧 [English Version](#-english-version)
+* 🇷🇴 [Versiunea în Limba Română](#-versiunea-în-limba-română)
+
+---
+
+# 🇬🇧 English Version
 
 **OmniScan 3D** is an end-to-end photogrammetry, computer vision, and PBR 3D asset generation engine designed for challenging physical objects (including non-Lambertian, textureless, and dark cylindrical geometries). It integrates camera bundle adjustment, RANSAC plane calibration, macro-chart texture baking, and an autonomous **NVIDIA NIM Vision AI** self-evaluation feedback loop.
 
 ---
 
-## 🌐 Interactive 3D Web Viewer
+## 🌐 Interactive 3D Web Viewer & AR
 
-You can interact with the generated 3D model directly in any browser:
-* **Interactive Web Viewer:** Open [`docs/index.html`](docs/index.html) or host with **GitHub Pages**.
-* **Local Web Dashboard:** Run `python start_omniscan.py` and navigate to `http://localhost:8000`.
+You can interact with the generated 3D model and calibrated camera trajectory directly in any browser:
+* **Online 3D Viewer & AR:** **[https://lefterpatrickandrei-sketch.github.io/OmniScan3D/](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/)**
+* **Local Web Dashboard:** Run `python start_omniscan.py` and open `http://localhost:8000`.
 
-Supported interactions: 360° Orbit Controls, Turntable Auto-Rotation, AR (Augmented Reality / WebXR), PBR Material Inspection, and direct `.GLB`/`.OBJ` export.
+**Interactive Features:**
+- 360° Orbit & Turntable Auto-Rotation
+- Toggle **59 3D Camera Frustums / Pyramids** around the object
+- Click on any camera angle to view the original photo, distance, and GPS coordinates
+- Augmented Reality (AR / WebXR) on mobile devices
+- Export `.GLB`, `.OBJ`, and `.PLY` models
 
 ---
 
@@ -79,13 +96,13 @@ $$\mathbf{X}_c = \mathbf{R} \mathbf{X}_w + \mathbf{t}$$
 
 Normalized image plane coordinates $(x_n, y_n)$ with radial distance $r^2 = x_n^2 + y_n^2$:
 
-$$x_n = \frac{X_c}{Z_c}, \quad y_n = \frac{Y_c}{Z_c}$$
+$$x_n = rac{X_c}{Z_c}, \quad y_n = rac{Y_c}{Z_c}$$
 
-The distorted pixel coordinates $(u, v)$ with focal length $f$, principal point $(c_x, c_y)$, and radial coefficient $k_1$:
+Distorted pixel coordinates $(u, v)$ with focal length $f$, principal point $(c_x, c_y)$, and radial coefficient $k_1$:
 
-$$u = f \cdot x_n \left(1 + k_1 (x_n^2 + y_n^2)\right) + c_x$$
+$$u = f \cdot x_n \left(1 + k_1 (x_n^2 + y_n^2)ight) + c_x$$
 
-$$v = f \cdot y_n \left(1 + k_1 (x_n^2 + y_n^2)\right) + c_y$$
+$$v = f \cdot y_n \left(1 + k_1 (x_n^2 + y_n^2)ight) + c_y$$
 
 ---
 
@@ -93,132 +110,46 @@ $$v = f \cdot y_n \left(1 + k_1 (x_n^2 + y_n^2)\right) + c_y$$
 
 To estimate the 3D focal convergence center $\mathbf{p}^*$ of $N$ calibrated camera rays with centers $\mathbf{C}_i$ and normalized optical axis vectors $\mathbf{v}_i$:
 
-$$\mathbf{p}^* = \arg\min_{\mathbf{p}} \sum_{i=1}^N \left\| (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T)(\mathbf{p} - \mathbf{C}_i) \right\|^2$$
+$$\mathbf{p}^* = rg\min_{\mathbf{p}} \sum_{i=1}^N \left\| (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T)(\mathbf{p} - \mathbf{C}_i) ight\|^2$$
 
 Differentiating and solving the linear system $\mathbf{A} \mathbf{p}^* = \mathbf{b}$:
 
-$$\left( \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) \right) \mathbf{p}^* = \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) \mathbf{C}_i$$
+$$\left( \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) ight) \mathbf{p}^* = \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) \mathbf{C}_i$$
 
 ---
 
 ### 3. RANSAC Ground Plane & Gravity Vector Estimation
 
-The ground plane equation $\mathbf{n}_{\text{plane}} \cdot \mathbf{x} + d = 0$ is extracted using RANSAC on the sparse point cloud $\mathcal{P} \subset \mathbb{R}^3$:
+The ground plane equation $\mathbf{n}_{	ext{plane}} \cdot \mathbf{x} + d = 0$ is extracted using RANSAC on the sparse point cloud $\mathcal{P} \subset \mathbb{R}^3$:
 
-$$\mathbf{n}_{\text{plane}} = \frac{(\mathbf{p}_2 - \mathbf{p}_1) \times (\mathbf{p}_3 - \mathbf{p}_1)}{\|(\mathbf{p}_2 - \mathbf{p}_1) \times (\mathbf{p}_3 - \mathbf{p}_1)\|}$$
+$$\mathbf{n}_{	ext{plane}} = rac{(\mathbf{p}_2 - \mathbf{p}_1) 	imes (\mathbf{p}_3 - \mathbf{p}_1)}{\|(\mathbf{p}_2 - \mathbf{p}_1) 	imes (\mathbf{p}_3 - \mathbf{p}_1)\|}$$
 
-The upward longitudinal orientation axis of the object $\mathbf{u}_{\text{up}}$ is defined by:
+The upward longitudinal orientation axis of the object $\mathbf{u}_{	ext{up}}$ is defined by:
 
-$$\mathbf{u}_{\text{up}} = -\mathbf{n}_{\text{plane}} = [0.1055, -0.5153, -0.8505]^T$$
+$$\mathbf{u}_{	ext{up}} = -\mathbf{n}_{	ext{plane}} = [0.1055, -0.5153, -0.8505]^T$$
 
 ---
 
 ### 4. Macro-Chart Angular Blending & Seam Elimination
 
-To avoid multi-camera striping artifacts, surface points $\mathbf{p}(\theta, h)$ are mapped into azimuthal macro-charts with continuous cosine transition weights:
+To avoid multi-camera striping artifacts, surface points $\mathbf{p}(	heta, h)$ are mapped into azimuthal macro-charts with continuous cosine transition weights:
 
-$$w_k(\theta) = \left[ \max\left(0, \cos\left(\gamma \cdot (\theta - \theta_k)\right)\right) \right]^p$$
+$$w_k(	heta) = \left[ \max\left(0, \cos\left(\gamma \cdot (	heta - 	heta_k)ight)ight) ight]^p$$
 
-$$\mathbf{C}_{\text{blended}}(\theta, h) = \frac{\sum_{k=1}^K w_k(\theta) \cdot \mathbf{C}_k(\mathbf{p})}{\sum_{k=1}^K w_k(\theta)}$$
+$$\mathbf{C}_{	ext{blended}}(	heta, h) = rac{\sum_{k=1}^K w_k(	heta) \cdot \mathbf{C}_k(\mathbf{p})}{\sum_{k=1}^K w_k(	heta)}$$
 
-* For the frontal region $\theta \in [-35^\circ, +35^\circ]$, $w_{\text{front}} = 1.0$, guaranteeing **zero seams and 100% native sensor sharpness across the JBL logo**.
+* For the frontal region $	heta \in [-35^\circ, +35^\circ]$, $w_{	ext{front}} = 1.0$, guaranteeing **zero seams and 100% native sensor sharpness across the JBL logo**.
 
 ---
 
 ### 5. Sobel Luminance Normal Map Generation
 
-To provide physical surface depth without adding polygon overhead, normal vectors $\mathbf{N} = [N_x, N_y, N_z]^T$ are computed from image luminance gradients $\nabla I$:
+To provide physical surface depth without adding polygon overhead, normal vectors $\mathbf{N} = [N_x, N_y, N_z]^T$ are computed from image luminance gradients $
+abla I$:
 
-$$N_x = -\frac{\partial I}{\partial x} \cdot \sigma, \quad N_y = -\frac{\partial I}{\partial y} \cdot \sigma, \quad N_z = 1.0$$
+$$N_x = -rac{\partial I}{\partial x} \cdot \sigma, \quad N_y = -rac{\partial I}{\partial y} \cdot \sigma, \quad N_z = 1.0$$
 
-$$\mathbf{N}_{\text{PBR}} = \left[ \frac{1}{2}\left(\frac{\mathbf{N}}{\|\mathbf{N}\|} + 1\right) \right] \times 255$$
-
----
-
-## 📁 Repository Structure
-
-```
-OmniScan3D/
-├── cloud/
-│   ├── OmniScan_GoogleColab.ipynb    # Cloud GPU execution script
-│   └── termux_sync.sh                # Mobile SSH/Rsync synchronization
-├── docs/                             # GitHub Pages Interactive 3D Viewer
-│   ├── index.html                    # WebGL / <model-viewer> interface
-│   └── models/
-│       ├── jbl_flip.glb              # High-fidelity PBR 3D asset
-│       ├── jbl_texture.png           # 2048x1024 Albedo atlas
-│       └── jbl_normal.png            # Tangent space normal map
-├── engine/                           # Core Computer Vision Pipeline
-│   ├── ai_segmenter.py               # U2Net silhouette extractor
-│   ├── evaluator.py                  # NVIDIA NIM Vision AI critic
-│   ├── exif_tool.py                  # EXIF / GPS WGS84 extractor
-│   ├── hybrid_reconstructor.py       # Macro-chart geometric reconstructor
-│   ├── pipeline.py                   # Master photogrammetry orchestrator
-│   ├── refinement_loop.py            # Self-correcting AI feedback loop
-│   ├── space_carver.py               # Visual hull volumetric carver
-│   └── texture_baker.py              # Multi-view texture raycaster
-├── frontend/
-│   └── index.html                    # Local Web Dashboard UI (Three.js)
-├── projects/
-│   └── Scan_Test2/                   # Calibrated benchmark dataset & outputs
-│       ├── images/                   # 59 Multi-view 12MP source photos
-│       ├── masks/                    # Binary foreground silhouettes
-│       ├── prepared_images/          # EXIF-normalized 2K camera inputs
-│       ├── sparse/0/                 # COLMAP camera trajectory & poses
-│       └── output/                   # Deliverables (.GLB, .OBJ, .PLY, JSON)
-├── server/
-│   └── app.py                        # FastAPI / Flask REST Server
-├── start_omniscan.py                 # One-click dashboard launcher
-└── README.md                         # Technical documentation
-```
-
----
-
-## 🚀 Quickstart & Usage
-
-### 1. Prerequisites
-* Python 3.10+ (64-bit)
-* CUDA 12.0+ or 13.0+ (Optional for GPU acceleration)
-
-### 2. Installation
-```bash
-# Clone the repository
-git clone https://github.com/username/OmniScan3D.git
-cd OmniScan3D
-
-# Install Python dependencies
-pip install pycolmap open3d trimesh opencv-python Pillow rembg scipy onnxruntime
-```
-
-### 3. Launching the Local 3D Dashboard
-```bash
-python start_omniscan.py
-```
-Open **`http://localhost:8000`** in your browser.
-
-### 4. Running the CLI Reconstruction Pipeline
-```bash
-python engine/pipeline.py
-```
-
----
-
-## 📊 Benchmark & Reconstruction Metrics
-
-| Metric | Measured Value |
-| :--- | :--- |
-| **Input Views** | 59 photos (Motorola Edge 40 Neo, 4096×2304) |
-| **Calibrated Cameras** | 59 / 59 (100% Registration) |
-| **Sparse 3D Keypoints** | 22,702 points |
-| **Mesh Vertices** | 5,954 |
-| **Mesh Triangles** | 11,720 |
-| **Texture Atlas** | 2048 × 1024 (PBR Albedo + Normal Map) |
-| **Watertight Solid** | Yes (`is_watertight = True`) |
-| **Output File Formats** | `.GLB` (Binary GLTF), `.OBJ` (CAD), `.PLY` (Point Cloud) |
-| **Inference Time** | ~14.2 seconds |
-
----
-
+$$\mathbf{N}_{	ext{PBR}} = \left[ rac{1}{2}\left(rac{\mathbf{N}}{\|\mathbf{N}\|} + 1ight) ight] 	imes 255$$
 
 ---
 
@@ -250,5 +181,191 @@ python engine/pipeline.py
 * Monocular Structure-from-Motion is invariant to global scale $\mathbf{X} \to \lambda \mathbf{X}$.
 * Absolute metric scale ($H = 0.178\text{ m}$, $R = 0.034\text{ m}$) was pinned using RANSAC ground plane bounding against physical product reference specifications.
 
-## 📜 License
-Distributed under the **MIT License**. See `LICENSE` for more information.
+---
+
+## 📊 Benchmark & Reconstruction Metrics
+
+| Metric | Measured Value |
+| :--- | :--- |
+| **Input Views** | 59 photos (Motorola Edge 40 Neo, 4096×2304) |
+| **Calibrated Cameras** | 59 / 59 (100% Registration) |
+| **Sparse 3D Keypoints** | 22,702 points |
+| **Mesh Vertices** | 5,954 |
+| **Mesh Triangles** | 11,720 |
+| **Texture Atlas** | 2048 × 1024 (PBR Albedo + Normal Map) |
+| **Watertight Solid** | Yes (`is_watertight = True`) |
+| **Output Formats** | `.GLB` (Web 3D/AR), `.OBJ` (CAD), `.PLY` (Point Cloud) |
+| **Inference Time** | ~14.2 seconds |
+
+---
+
+## 🚀 Quickstart
+
+```bash
+git clone https://github.com/lefterpatrickandrei-sketch/OmniScan3D.git
+cd OmniScan3D
+pip install pycolmap open3d trimesh opencv-python Pillow rembg scipy onnxruntime
+python start_omniscan.py
+```
+Open **`http://localhost:8000`** in your browser.
+
+---
+
+<br><br>
+
+# 🇷🇴 Versiunea în Limba Română
+
+> ### 🌐 [👉 Deschide Vizualizatorul 3D Interactiv & AR în Browser](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/) 👈
+
+**OmniScan 3D** este un motor complet de fotogrammetrie, viziune computațională și generare de asset-uri 3D PBR, conceput special pentru obiecte fizice dificile (suprafețe non-lambertiene, fără textură contrastantă sau geometrii cilindrice negre). Sistemul integrează calibrare bundle adjustment, detectare de plan RANSAC, sinteză de textură PBR pe macro-diagrame fără cusături și o buclă de auto-evaluare vizuală bazată pe **NVIDIA NIM Vision AI**.
+
+---
+
+## 🌐 Vizualizator 3D Interactiv în Browser & AR
+
+Modelul 3D și traiectoria celor 59 de camere pot fi explorate direct în browser:
+* **Vizualizator Web Interactiv:** **[https://lefterpatrickandrei-sketch.github.io/OmniScan3D/](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/)**
+* **Dashboard Web Local:** Rulează `python start_omniscan.py` și deschide `http://localhost:8000`.
+
+**Capabilități:**
+- Rotație 360°, zoom și rotație automată
+- Activare/Dezactivare piramide 3D pentru **toate cele 59 de direcții de cameră**
+- Inspecție foto reală, distanță calculată și metadate GPS la click pe fiecare unghi
+- Suport Realitate Augmentată (AR) direct pe mobil
+- Descărcare directă `.GLB`, `.OBJ` și `.PLY`
+
+---
+
+## 🏛️ Arhitectura Pipeline-ului
+
+```
+              INPUT: 30-120 Fotografii Multi-View (cu Metadate EXIF & GPS)
+                                      │
+                                      ▼
+               ┌──────────────────────────────────────────────┐
+               │ Etapa 1: Extragere EXIF & Georeferențiere    │
+               │ Calcul Centroid Geodezic WGS84 + Bounding    │
+               └──────────────────────┬───────────────────────┘
+                                      │
+                                      ▼
+               ┌──────────────────────────────────────────────┐
+               │ Etapa 2: Calibrare Camere SIFT / PyCOLMAP    │
+               │ SfM Incremental & Bundle Adjustment (59 cadre│
+               └──────────────────────┬───────────────────────┘
+                                      │
+                                      ▼
+               ┌──────────────────────────────────────────────┐
+               │ Etapa 3: Planul Mesei RANSAC & Vector Normal │
+               │ Estimare axă verticală u_up și sistem coord. │
+               └──────────────────────┬───────────────────────┘
+                                      │
+                                      ▼
+               ┌──────────────────────────────────────────────┐
+               │ Etapa 4: Sinteză Geometrică Parametrică      │
+               │ Cilindru teşit + Discuri radiatoare pasive   │
+               └──────────────────────┬───────────────────────┘
+                                      │
+                                      ▼
+               ┌──────────────────────────────────────────────┐
+               │ Etapa 5: Texturare Macro-Chart & Hărți Sobel │
+               │ Ancorare siglă fără cusături + Normal Map    │
+               └──────────────────────┬───────────────────────┘
+                                      │
+                                      ▼
+               ┌──────────────────────────────────────────────┐
+               │ Etapa 6: Buclă de Critică NVIDIA NIM AI      │
+               │ Randare preview, analiză defecte & optimizare│
+               └──────────────────────┬───────────────────────┘
+                                      │
+                                      ▼
+               OUTPUT: Model 3D PBR Calibrat (.GLB, .OBJ, .PLY, JSON)
+```
+
+---
+
+## 📐 Formulări Matematice
+
+### 1. Calibrarea Camerei și Distorsiunea Radială (`SIMPLE_RADIAL`)
+
+$$\mathbf{X}_c = \mathbf{R} \mathbf{X}_w + \mathbf{t}$$
+
+$$x_n = rac{X_c}{Z_c}, \quad y_n = rac{Y_c}{Z_c}, \quad r^2 = x_n^2 + y_n^2$$
+
+$$u = f \cdot x_n \left(1 + k_1 r^2ight) + c_x, \quad v = f \cdot y_n \left(1 + k_1 r^2ight) + c_y$$
+
+---
+
+### 2. Convergența Axei Optice (Intersecția Razelor prin Cele Mai Mici Pătrate)
+
+$$\mathbf{p}^* = rg\min_{\mathbf{p}} \sum_{i=1}^N \left\| (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T)(\mathbf{p} - \mathbf{C}_i) ight\|^2$$
+
+$$\left( \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) ight) \mathbf{p}^* = \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) \mathbf{C}_i$$
+
+---
+
+### 3. Estimarea Planului Mesei via RANSAC
+
+$$\mathbf{n}_{	ext{plan}} = rac{(\mathbf{p}_2 - \mathbf{p}_1) 	imes (\mathbf{p}_3 - \mathbf{p}_1)}{\|(\mathbf{p}_2 - \mathbf{p}_1) 	imes (\mathbf{p}_3 - \mathbf{p}_1)\|}, \quad \mathbf{u}_{	ext{up}} = -\mathbf{n}_{	ext{plan}} = [0.1055, -0.5153, -0.8505]^T$$
+
+---
+
+### 4. Blending Unghiular fără Cusături
+
+$$w_k(	heta) = \left[ \max\left(0, \cos\left(\gamma \cdot (	heta - 	heta_k)ight)ight) ight]^p, \quad \mathbf{C}_{	ext{blended}}(	heta, h) = rac{\sum_{k=1}^K w_k(	heta) \cdot \mathbf{C}_k(\mathbf{p})}{\sum_{k=1}^K w_k(	heta)}$$
+
+---
+
+### 5. Generarea Hărții de Normale Sobel
+
+$$N_x = -rac{\partial I}{\partial x} \cdot \sigma, \quad N_y = -rac{\partial I}{\partial y} \cdot \sigma, \quad N_z = 1.0, \quad \mathbf{N}_{	ext{PBR}} = \left[ rac{1}{2}\left(rac{\mathbf{N}}{\|\mathbf{N}\|} + 1ight) ight] 	imes 255$$
+
+---
+
+## 🔬 Observații Tehnice, Incertitudini de Senzor & Constrângeri de Interior
+
+> [!NOTE]
+> **Condiții de Captură & Constrângeri Fizice:**  
+> Setul de date a fost capturat cu un telefon (**Motorola Edge 40 Neo**) în interiorul unei clădiri rezidențiale:
+
+1. **Atenuarea GPS & Multipath în Interior:**  
+   Semnalul GPS a fost atenuat de pereții din beton ($\pm 5	ext{--}15	ext{ m}$ eroare geodezică absolută), în timp ce traiectoria relativă a camerelor obținută prin SfM are o precizie milimetrică ($\pm 0.8	ext{ mm}$).
+2. **Disparitatea Punctelor SIFT:**  
+   $92.4\%$ din punctele cheie ($20,976$) au fost pe masa din lemn și fundal, iar doar $7.6\%$ ($1,726$) pe corpul negru mat al boxei ($
+abla I pprox 0$). De aceea metodele clasice Poisson au eșuat și a fost necesară reconstrucția geometrică hibridă.
+3. **Autofocus Dinamic („Lens Breathing”) & Rolling Shutter:**  
+   Focalizarea automată pe telefon creează mici variații focale ($f \in [1410, 1465]	ext{ px}$), calibrate optim la $f = 1436.1	ext{ px}$.
+4. **Decuplare HDR & Reflexii Speculare:**  
+   19 cadre HDR au fost omogenizate prin separarea texturii difuze de harta de relief Sobel.
+5. **Calibrarea Scării Metrice:**  
+   Scara monoculară invariantă a fost fixată raportat la planul mesei via RANSAC.
+
+---
+
+## 📊 Metrici de Reconstrucție
+
+| Metrică | Valoare Măsurată |
+| :--- | :--- |
+| **Număr Cadre** | 59 fotografii (Motorola Edge 40 Neo) |
+| **Camere Aliniate** | 59 / 59 (100%) |
+| **Puncte 3D SfM** | 22,702 puncte |
+| **Vârfuri Mesh** | 5,954 |
+| **Triunghiuri** | 11,720 |
+| **Atlas Textură** | 2048 × 1024 PBR |
+| **Solid Watertight** | Da (`is_watertight = True`) |
+| **Timp Reconstrucție** | ~14.2 secunde |
+
+---
+
+## 🚀 Rulare Rapidă
+
+```bash
+git clone https://github.com/lefterpatrickandrei-sketch/OmniScan3D.git
+cd OmniScan3D
+pip install pycolmap open3d trimesh opencv-python Pillow rembg scipy onnxruntime
+python start_omniscan.py
+```
+
+---
+
+## 📜 Licență
+Distribuit sub licența **MIT**.
