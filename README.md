@@ -90,66 +90,65 @@ You can interact with the generated 3D model and calibrated camera trajectory di
 
 ### 1. Camera Projection & Radial Distortion Model (`SIMPLE_RADIAL`)
 
-For each 3D point $\mathbf{X}_w \in \mathbb{R}^3$, the world-to-camera transformation with rotation matrix $\mathbf{R} \in SO(3)$ and translation vector $\mathbf{t} \in \mathbb{R}^3$ yields camera coordinates $\mathbf{X}_c = [X_c, Y_c, Z_c]^T$:
+For each 3D point $\mathbf{X}_w \in \mathbb{R}^3$, the world-to-camera transformation with rotation matrix $\mathbf{R} \in \mathrm{SO}(3)$ and translation vector $\mathbf{t} \in \mathbb{R}^3$ yields camera coordinates $\mathbf{X}_c = [X_c, Y_c, Z_c]^T$:
 
 $$\mathbf{X}_c = \mathbf{R} \mathbf{X}_w + \mathbf{t}$$
 
 Normalized image plane coordinates $(x_n, y_n)$ with radial distance $r^2 = x_n^2 + y_n^2$:
 
-$$x_n = rac{X_c}{Z_c}, \quad y_n = rac{Y_c}{Z_c}$$
+$$x_n = \frac{X_c}{Z_c}, \quad y_n = \frac{Y_c}{Z_c}, \quad r^2 = x_n^2 + y_n^2$$
 
-Distorted pixel coordinates $(u, v)$ with focal length $f$, principal point $(c_x, c_y)$, and radial coefficient $k_1$:
+Distorted pixel coordinates $(u, v)$ with focal length $f$, principal point $(c_x, c_y)$, and radial distortion coefficient $k_1$:
 
-$$u = f \cdot x_n \left(1 + k_1 (x_n^2 + y_n^2)ight) + c_x$$
+$$u = f \cdot x_n (1 + k_1 r^2) + c_x$$
 
-$$v = f \cdot y_n \left(1 + k_1 (x_n^2 + y_n^2)ight) + c_y$$
+$$v = f \cdot y_n (1 + k_1 r^2) + c_y$$
 
 ---
 
 ### 2. Optical Axis Convergence (Least Squares 3D Ray Intersection)
 
-To estimate the 3D focal convergence center $\mathbf{p}^*$ of $N$ calibrated camera rays with centers $\mathbf{C}_i$ and normalized optical axis vectors $\mathbf{v}_i$:
+To estimate the 3D focal convergence center $\mathbf{p}^*$ of $N$ calibrated camera rays with centers $\mathbf{C}_i$ and normalized optical axis unit vectors $\mathbf{v}_i$:
 
-$$\mathbf{p}^* = rg\min_{\mathbf{p}} \sum_{i=1}^N \left\| (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T)(\mathbf{p} - \mathbf{C}_i) ight\|^2$$
+$$\mathbf{p}^* = \operatorname{arg\,min}_{\mathbf{p}} \sum_{i=1}^N \| (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T)(\mathbf{p} - \mathbf{C}_i) \|^2$$
 
-Differentiating and solving the linear system $\mathbf{A} \mathbf{p}^* = \mathbf{b}$:
+Solving the resulting symmetric linear system $\mathbf{A} \mathbf{p}^* = \mathbf{b}$:
 
-$$\left( \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) ight) \mathbf{p}^* = \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) \mathbf{C}_i$$
+$$\left( \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) \right) \mathbf{p}^* = \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) \mathbf{C}_i$$
 
 ---
 
 ### 3. RANSAC Ground Plane & Gravity Vector Estimation
 
-The ground plane equation $\mathbf{n}_{	ext{plane}} \cdot \mathbf{x} + d = 0$ is extracted using RANSAC on the sparse point cloud $\mathcal{P} \subset \mathbb{R}^3$:
+The ground plane equation $\mathbf{n}_{\text{plane}} \cdot \mathbf{x} + d = 0$ is extracted using RANSAC on the sparse point cloud $\mathcal{P} \subset \mathbb{R}^3$:
 
-$$\mathbf{n}_{	ext{plane}} = rac{(\mathbf{p}_2 - \mathbf{p}_1) 	imes (\mathbf{p}_3 - \mathbf{p}_1)}{\|(\mathbf{p}_2 - \mathbf{p}_1) 	imes (\mathbf{p}_3 - \mathbf{p}_1)\|}$$
+$$\mathbf{n}_{\text{plane}} = \frac{(\mathbf{p}_2 - \mathbf{p}_1) \times (\mathbf{p}_3 - \mathbf{p}_1)}{\|(\mathbf{p}_2 - \mathbf{p}_1) \times (\mathbf{p}_3 - \mathbf{p}_1)\|}$$
 
-The upward longitudinal orientation axis of the object $\mathbf{u}_{	ext{up}}$ is defined by:
+The upward longitudinal orientation axis of the object $\mathbf{u}_{\text{up}}$ is defined by:
 
-$$\mathbf{u}_{	ext{up}} = -\mathbf{n}_{	ext{plane}} = [0.1055, -0.5153, -0.8505]^T$$
+$$\mathbf{u}_{\text{up}} = -\mathbf{n}_{\text{plane}} = [0.1055, -0.5153, -0.8505]^T$$
 
 ---
 
 ### 4. Macro-Chart Angular Blending & Seam Elimination
 
-To avoid multi-camera striping artifacts, surface points $\mathbf{p}(	heta, h)$ are mapped into azimuthal macro-charts with continuous cosine transition weights:
+To avoid multi-camera striping artifacts, surface points $\mathbf{p}(\theta, h)$ are mapped into azimuthal macro-charts with continuous cosine transition weights:
 
-$$w_k(	heta) = \left[ \max\left(0, \cos\left(\gamma \cdot (	heta - 	heta_k)ight)ight) ight]^p$$
+$$w_k(\theta) = \left[ \max\left(0, \cos(\gamma \cdot (\theta - \theta_k))\right) \right]^p$$
 
-$$\mathbf{C}_{	ext{blended}}(	heta, h) = rac{\sum_{k=1}^K w_k(	heta) \cdot \mathbf{C}_k(\mathbf{p})}{\sum_{k=1}^K w_k(	heta)}$$
+$$\mathbf{C}_{\text{blended}}(\theta, h) = \frac{\sum_{k=1}^K w_k(\theta) \cdot \mathbf{C}_k(\mathbf{p})}{\sum_{k=1}^K w_k(\theta)}$$
 
-* For the frontal region $	heta \in [-35^\circ, +35^\circ]$, $w_{	ext{front}} = 1.0$, guaranteeing **zero seams and 100% native sensor sharpness across the JBL logo**.
+* For the frontal region $\theta \in [-35^\circ, +35^\circ]$, $w_{\text{front}} = 1.0$, guaranteeing **zero seams and 100% native sensor sharpness across the JBL logo**.
 
 ---
 
 ### 5. Sobel Luminance Normal Map Generation
 
-To provide physical surface depth without adding polygon overhead, normal vectors $\mathbf{N} = [N_x, N_y, N_z]^T$ are computed from image luminance gradients $
-abla I$:
+To provide physical surface depth without adding polygon overhead, normal vectors $\mathbf{N} = [N_x, N_y, N_z]^T$ are computed from image luminance gradients $\nabla I$:
 
-$$N_x = -rac{\partial I}{\partial x} \cdot \sigma, \quad N_y = -rac{\partial I}{\partial y} \cdot \sigma, \quad N_z = 1.0$$
+$$N_x = -\frac{\partial I}{\partial x} \cdot \sigma, \quad N_y = -\frac{\partial I}{\partial y} \cdot \sigma, \quad N_z = 1.0$$
 
-$$\mathbf{N}_{	ext{PBR}} = \left[ rac{1}{2}\left(rac{\mathbf{N}}{\|\mathbf{N}\|} + 1ight) ight] 	imes 255$$
+$$\mathbf{N}_{\text{PBR}} = \left[ \frac{1}{2}\left(\frac{\mathbf{N}}{\|\mathbf{N}\|} + 1\right) \right] \times 255$$
 
 ---
 
@@ -161,7 +160,7 @@ $$\mathbf{N}_{	ext{PBR}} = \left[ rac{1}{2}\left(rac{\mathbf{N}}{\|\mathbf{N}\
 
 ### 1. Indoor GNSS Multipath & Dilution of Precision (DOP)
 * **Indoor GPS Attenuation:** GPS/GNSS signals experience radio-frequency attenuation and multi-path reflections through reinforced concrete ceilings and walls.
-* **Accuracy Distinction:** While the **relative inter-camera baseline vectors** $\Delta \mathbf{C}_{ij}$ computed via epipolar geometry and bundle adjustment possess sub-millimeter relative precision ($\sigma_{\text{SfM}} pprox \pm 0.8\text{ mm}$), the absolute **WGS84 geodetic coordinates** (Lat $44.54852^\circ$, Lon $26.06934^\circ$, Alt $132.0\text{ m}$) have an expected indoor dilution uncertainty of $\pm 5\text{--}15\text{ m}$.
+* **Accuracy Distinction:** While the **relative inter-camera baseline vectors** $\Delta \mathbf{C}_{ij}$ computed via epipolar geometry and bundle adjustment possess sub-millimeter relative precision ($\sigma_{\text{SfM}} \approx \pm 0.8\text{ mm}$), the absolute **WGS84 geodetic coordinates** (Lat $44.54852^\circ$, Lon $26.06934^\circ$, Alt $132.0\text{ m}$) have an expected indoor dilution uncertainty of $\pm 5\text{--}15\text{ m}$.
 
 ### 2. SIFT Keypoint Disparity on Black / Textureless Objects
 * **Background vs. Foreground Distribution:**
@@ -287,37 +286,61 @@ Modelul 3D și traiectoria celor 59 de camere pot fi explorate direct în browse
 
 ### 1. Calibrarea Camerei și Distorsiunea Radială (`SIMPLE_RADIAL`)
 
+Pentru fiecare punct 3D din spațiul lumii $\mathbf{X}_w \in \mathbb{R}^3$, transformarea în coordonatele camerei $\mathbf{X}_c = [X_c, Y_c, Z_c]^T$ folosind matricea de rotație $\mathbf{R} \in \mathrm{SO}(3)$ și vectorul de translație $\mathbf{t} \in \mathbb{R}^3$:
+
 $$\mathbf{X}_c = \mathbf{R} \mathbf{X}_w + \mathbf{t}$$
 
-$$x_n = rac{X_c}{Z_c}, \quad y_n = rac{Y_c}{Z_c}, \quad r^2 = x_n^2 + y_n^2$$
+Coordonatele normalizate în planul imaginii $(x_n, y_n)$ și distanța radială $r^2 = x_n^2 + y_n^2$:
 
-$$u = f \cdot x_n \left(1 + k_1 r^2ight) + c_x, \quad v = f \cdot y_n \left(1 + k_1 r^2ight) + c_y$$
+$$x_n = \frac{X_c}{Z_c}, \quad y_n = \frac{Y_c}{Z_c}, \quad r^2 = x_n^2 + y_n^2$$
+
+Coordonatele finale în pixeli $(u, v)$ cu distanța focală $f$, punctul principal $(c_x, c_y)$ și coeficientul de distorsiune radială $k_1$:
+
+$$u = f \cdot x_n (1 + k_1 r^2) + c_x$$
+
+$$v = f \cdot y_n (1 + k_1 r^2) + c_y$$
 
 ---
 
 ### 2. Convergența Axei Optice (Intersecția Razelor prin Cele Mai Mici Pătrate)
 
-$$\mathbf{p}^* = rg\min_{\mathbf{p}} \sum_{i=1}^N \left\| (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T)(\mathbf{p} - \mathbf{C}_i) ight\|^2$$
+Pentru a estima centrul de focalizare 3D $\mathbf{p}^*$ al celor $N$ raze de cameră calibrate cu centrele $\mathbf{C}_i$ și vectorii direcționali unitari normalizați $\mathbf{v}_i$:
 
-$$\left( \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) ight) \mathbf{p}^* = \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) \mathbf{C}_i$$
+$$\mathbf{p}^* = \operatorname{arg\,min}_{\mathbf{p}} \sum_{i=1}^N \| (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T)(\mathbf{p} - \mathbf{C}_i) \|^2$$
+
+Rezolvând sistemul liniar simetric $\mathbf{A} \mathbf{p}^* = \mathbf{b}$:
+
+$$\left( \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) \right) \mathbf{p}^* = \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) \mathbf{C}_i$$
 
 ---
 
 ### 3. Estimarea Planului Mesei via RANSAC
 
-$$\mathbf{n}_{	ext{plan}} = rac{(\mathbf{p}_2 - \mathbf{p}_1) 	imes (\mathbf{p}_3 - \mathbf{p}_1)}{\|(\mathbf{p}_2 - \mathbf{p}_1) 	imes (\mathbf{p}_3 - \mathbf{p}_1)\|}, \quad \mathbf{u}_{	ext{up}} = -\mathbf{n}_{	ext{plan}} = [0.1055, -0.5153, -0.8505]^T$$
+Ecuația planului mesei $\mathbf{n}_{\text{plan}} \cdot \mathbf{x} + d = 0$ este extrasă din norul de puncte sparse $\mathcal{P} \subset \mathbb{R}^3$:
+
+$$\mathbf{n}_{\text{plan}} = \frac{(\mathbf{p}_2 - \mathbf{p}_1) \times (\mathbf{p}_3 - \mathbf{p}_1)}{\|(\mathbf{p}_2 - \mathbf{p}_1) \times (\mathbf{p}_3 - \mathbf{p}_1)\|}$$
+
+Axul longitudinal vertical al obiectului $\mathbf{u}_{\text{up}}$:
+
+$$\mathbf{u}_{\text{up}} = -\mathbf{n}_{\text{plan}} = [0.1055, -0.5153, -0.8505]^T$$
 
 ---
 
 ### 4. Blending Unghiular fără Cusături
 
-$$w_k(	heta) = \left[ \max\left(0, \cos\left(\gamma \cdot (	heta - 	heta_k)ight)ight) ight]^p, \quad \mathbf{C}_{	ext{blended}}(	heta, h) = rac{\sum_{k=1}^K w_k(	heta) \cdot \mathbf{C}_k(\mathbf{p})}{\sum_{k=1}^K w_k(	heta)}$$
+$$w_k(\theta) = \left[ \max\left(0, \cos(\gamma \cdot (\theta - \theta_k))\right) \right]^p$$
+
+$$\mathbf{C}_{\text{blended}}(\theta, h) = \frac{\sum_{k=1}^K w_k(\theta) \cdot \mathbf{C}_k(\mathbf{p})}{\sum_{k=1}^K w_k(\theta)}$$
 
 ---
 
 ### 5. Generarea Hărții de Normale Sobel
 
-$$N_x = -rac{\partial I}{\partial x} \cdot \sigma, \quad N_y = -rac{\partial I}{\partial y} \cdot \sigma, \quad N_z = 1.0, \quad \mathbf{N}_{	ext{PBR}} = \left[ rac{1}{2}\left(rac{\mathbf{N}}{\|\mathbf{N}\|} + 1ight) ight] 	imes 255$$
+Vectorii normali $\mathbf{N} = [N_x, N_y, N_z]^T$ din gradienții de luminanță ai imaginii $\nabla I$:
+
+$$N_x = -\frac{\partial I}{\partial x} \cdot \sigma, \quad N_y = -\frac{\partial I}{\partial y} \cdot \sigma, \quad N_z = 1.0$$
+
+$$\mathbf{N}_{\text{PBR}} = \left[ \frac{1}{2}\left(\frac{\mathbf{N}}{\|\mathbf{N}\|} + 1\right) \right] \times 255$$
 
 ---
 
@@ -328,12 +351,11 @@ $$N_x = -rac{\partial I}{\partial x} \cdot \sigma, \quad N_y = -rac{\partial I
 > Setul de date a fost capturat cu un telefon (**Motorola Edge 40 Neo**) în interiorul unei clădiri rezidențiale:
 
 1. **Atenuarea GPS & Multipath în Interior:**  
-   Semnalul GPS a fost atenuat de pereții din beton ($\pm 5	ext{--}15	ext{ m}$ eroare geodezică absolută), în timp ce traiectoria relativă a camerelor obținută prin SfM are o precizie milimetrică ($\pm 0.8	ext{ mm}$).
+   Semnalul GPS a fost atenuat de pereții din beton ($\pm 5\text{--}15\text{ m}$ eroare geodezică absolută), în timp ce traiectoria relativă a camerelor obținută prin SfM are o precizie milimetrică ($\pm 0.8\text{ mm}$).
 2. **Disparitatea Punctelor SIFT:**  
-   $92.4\%$ din punctele cheie ($20,976$) au fost pe masa din lemn și fundal, iar doar $7.6\%$ ($1,726$) pe corpul negru mat al boxei ($
-abla I pprox 0$). De aceea metodele clasice Poisson au eșuat și a fost necesară reconstrucția geometrică hibridă.
+   $92.4\%$ din punctele cheie ($20,976$) au fost pe masa din lemn și fundal, iar doar $7.6\%$ ($1,726$) pe corpul negru mat al boxei ($\nabla I \approx 0$). De aceea metodele clasice Poisson au eșuat și a fost necesară reconstrucția geometrică hibridă.
 3. **Autofocus Dinamic („Lens Breathing”) & Rolling Shutter:**  
-   Focalizarea automată pe telefon creează mici variații focale ($f \in [1410, 1465]	ext{ px}$), calibrate optim la $f = 1436.1	ext{ px}$.
+   Focalizarea automată pe telefon creează mici variații focale ($f \in [1410, 1465]\text{ px}$), calibrate optim la $f = 1436.1\text{ px}$.
 4. **Decuplare HDR & Reflexii Speculare:**  
    19 cadre HDR au fost omogenizate prin separarea texturii difuze de harta de relief Sobel.
 5. **Calibrarea Scării Metrice:**  
