@@ -5,7 +5,7 @@
 > **📦 Download Release (.ZIP):** [GitHub Releases v1.0.0](https://github.com/lefterpatrickandrei-sketch/OmniScan3D/releases/tag/v1.0.0)
 
 [![Live 3D Demo](https://img.shields.io/badge/Live%203D%20Demo-GitHub%20Pages-blue?style=for-the-badge&logo=googlechrome&logoColor=white)](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/)
-[![Lightweight Hardware](https://img.shields.io/badge/Hardware-Any%20Laptop%20%2F%20Low%20Spec-orange?style=for-the-badge)](https://github.com/lefterpatrickandrei-sketch/OmniScan3D)
+[![Hardware Footprint](https://img.shields.io/badge/Hardware-Lightweight%20%2F%20Standard%20Laptop-orange?style=for-the-badge)](https://github.com/lefterpatrickandrei-sketch/OmniScan3D)
 [![NVIDIA NIM API](https://img.shields.io/badge/AI%20Vision-NVIDIA%20NIM%20API-green?style=for-the-badge)](https://developer.nvidia.com/nim)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
@@ -19,34 +19,34 @@
 
 # 🇬🇧 English Version
 
-> **OmniScan 3D is simply a practical field tool designed to assist surveying and field engineers in quickly collecting on-site data and generating clear, interactive 3D visual and geometric reports for clients and project documentation.**
+> **OmniScan 3D is a practical field tool designed to assist surveying and field engineers in quickly collecting on-site photographic data and generating clear, interactive 3D visual and geometric reports for clients and project documentation.**
 
-### 💡 Low Hardware Requirements & Cloud API Architecture
-* **No Expensive Workstation Needed:** The heavy AI vision analysis and evaluation loop runs remotely via **NVIDIA NIM Cloud APIs** (`meta/llama-3.2-11b-vision-instruct`), eliminating the need for bulky, multi-thousand-dollar GPU rigs in the field.
-* **Runs on Standard Laptops:** The local photogrammetry and geometric pipeline is optimized to run efficiently on ordinary field laptops, ultrabooks, or mini-PCs.
-* **Instant Client Delivery:** 3D models are rendered natively in the browser using WebGL / `<model-viewer>`, opening smoothly on any office PC, tablet, or smartphone without requiring specialized CAD software.
+### 💡 Lightweight Hardware & API Architecture
+* **Local Offline Core:** The photogrammetry engine (SIFT feature extraction, Structure-from-Motion bundle adjustment, geometric synthesis, and WebGL viewer) runs entirely on standard laptops without requiring costly, multi-thousand-dollar GPU workstations.
+* **Cloud API Vision Assistant:** Heavy multimodal AI quality assurance and visual critique are offloaded to **NVIDIA NIM Cloud APIs** (`meta/llama-3.2-11b-vision-instruct`), requiring zero local VRAM overhead.
+* **Instant Client Delivery:** Reconstructed 3D assets render natively in any web browser via WebGL / `<model-viewer>`, opening smoothly on any office PC, tablet, or smartphone without specialized CAD software.
 
 ---
 
 ## 🌐 Interactive 3D Web Viewer & AR
 
-You can interact with the generated 3D model and calibrated camera trajectory directly in any browser:
+You can interact with the benchmark 3D model and calibrated camera trajectory directly in any browser:
 * **Online 3D Viewer & AR:** **[https://lefterpatrickandrei-sketch.github.io/OmniScan3D/](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/)**
 * **Local Web Dashboard:** Run `python start_omniscan.py` and open `http://localhost:8000`.
 
-**Interactive Features:**
+**Interactive Capabilities:**
 - 360° Orbit & Turntable Auto-Rotation
-- Toggle **59 3D Camera Frustums / Pyramids** around the object
-- Click on any camera angle to view the original photo, distance, and GPS coordinates
-- Augmented Reality (AR / WebXR) on mobile devices
-- Export `.GLB`, `.OBJ`, and `.PLY` models for reporting and CAD/GIS integration
+- Toggle **59 3D Camera Frustums / Pyramids** around the object in space
+- Click on any camera angle to view the original photo, distance to object, and GPS coordinates
+- Augmented Reality (AR / WebXR) inspection on mobile devices
+- Direct export to `.GLB`, `.OBJ`, and `.PLY` for CAD/GIS reporting
 
 ---
 
 ## 🏛️ Pipeline Architecture
 
 ```
-                    INPUT: 30-120 Multi-View Photographs (with EXIF GPS)
+                    INPUT: 30-120 Multi-View Field Photographs (with EXIF GPS)
                                       │
                                       ▼
                ┌──────────────────────────────────────────────┐
@@ -57,35 +57,35 @@ You can interact with the generated 3D model and calibrated camera trajectory di
                                       ▼
                ┌──────────────────────────────────────────────┐
                │ Stage 2: SIFT / PyCOLMAP Camera Calibration   │
-               │ Lightweight local SfM (59 views in seconds)  │
+               │ Fast local SfM (59 views in ~14 seconds)     │
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
                ┌──────────────────────────────────────────────┐
-               │ Stage 3: RANSAC Ground Plane & Axis Finding  │
+               │ Stage 3: RANSAC Ground / Reference Plane     │
                │ Normal vector computation & coordinate frame │
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
                ┌──────────────────────────────────────────────┐
-               │ Stage 4: Parametric Physical Synthesis       │
-               │ Filleted cylinder + Recessed radiator caps   │
+               │ Stage 4: Geometric & Structural Synthesis    │
+               │ Silhouette-constrained boundary modeling     │
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
                ┌──────────────────────────────────────────────┐
-               │ Stage 5: Macro-Chart PBR Texturing & Normal  │
-               │ Zero-seam logo anchoring + Sobel bump map    │
+               │ Stage 5: Macro-Chart PBR Texturing & Normals │
+               │ Continuous angular blending + Sobel bump map │
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
                ┌──────────────────────────────────────────────┐
                │ Stage 6: NVIDIA NIM Vision Cloud API Loop    │
-               │ Remote AI critique (No local VRAM needed)    │
+               │ Automated visual critique (Cloud AI API)     │
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
-               OUTPUT: Production PBR 3D Model (.GLB, .OBJ, Maps)
+               OUTPUT: Production PBR 3D Asset & Report (.GLB, .OBJ, Maps)
 ```
 
 ---
@@ -112,7 +112,7 @@ $$v = f \cdot y_n (1 + k_1 r^2) + c_y$$
 
 ### 2. Optical Axis Convergence (Least Squares 3D Ray Intersection)
 
-To estimate the 3D focal convergence center $\mathbf{p}^*$ of $N$ calibrated camera rays with centers $\mathbf{C}_i$ and normalized optical axis unit vectors $\mathbf{v}_i$:
+To estimate the 3D focal convergence center $\mathbf{p}^*$ of $N$ calibrated camera rays with optical centers $\mathbf{C}_i$ and normalized direction vectors $\mathbf{v}_i$:
 
 $$\mathbf{p}^* = \arg\min_{\mathbf{p}} \sum_{i=1}^N \| (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T)(\mathbf{p} - \mathbf{C}_i) \|^2$$
 
@@ -122,13 +122,13 @@ $$\left( \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) \right) \mathbf
 
 ---
 
-### 3. RANSAC Ground Plane & Gravity Vector Estimation
+### 3. RANSAC Ground / Reference Plane & Gravity Vector Estimation
 
-The ground plane equation $\mathbf{n}_{\text{plane}} \cdot \mathbf{x} + d = 0$ is extracted using RANSAC on the sparse point cloud $\mathcal{P} \subset \mathbb{R}^3$:
+The ground / support plane equation $\mathbf{n}_{\text{plane}} \cdot \mathbf{x} + d = 0$ is extracted using RANSAC on the sparse 3D point cloud $\mathcal{P} \subset \mathbb{R}^3$:
 
 $$\mathbf{n}_{\text{plane}} = \frac{(\mathbf{p}_2 - \mathbf{p}_1) \times (\mathbf{p}_3 - \mathbf{p}_1)}{\|(\mathbf{p}_2 - \mathbf{p}_1) \times (\mathbf{p}_3 - \mathbf{p}_1)\|}$$
 
-The upward longitudinal orientation axis of the object $\mathbf{u}_{\text{up}}$ is defined by:
+The upward vertical orientation axis $\mathbf{u}_{\text{up}}$ is given by the anti-normal of the support plane:
 
 $$\mathbf{u}_{\text{up}} = -\mathbf{n}_{\text{plane}} = [0.1055, -0.5153, -0.8505]^T$$
 
@@ -142,7 +142,7 @@ $$w_k(\theta) = \left[ \max\left(0, \cos(\gamma \cdot (\theta - \theta_k))\right
 
 $$\mathbf{C}_{\text{blended}}(\theta, h) = \frac{\sum_{k=1}^K w_k(\theta) \cdot \mathbf{C}_k(\mathbf{p})}{\sum_{k=1}^K w_k(\theta)}$$
 
-* For the frontal region $\theta \in [-35^\circ, +35^\circ]$, $w_{\text{front}} = 1.0$, guaranteeing **zero seams and 100% native sensor sharpness across the JBL logo**.
+* For the primary frontal quadrant $\theta \in [-35^\circ, +35^\circ]$, $w_{\text{front}} = 1.0$, guaranteeing **zero seams and 100% native sensor sharpness across focal features**.
 
 ---
 
@@ -160,17 +160,17 @@ $$\mathbf{N}_{\text{PBR}} = \left[ \frac{1}{2}\left(\frac{\mathbf{N}}{\|\mathbf{
 
 > [!NOTE]
 > **Measurement Disclaimers & Physical Constraints:**  
-> The benchmark dataset was captured using a consumer smartphone (**Motorola Edge 40 Neo**) inside a residential indoor environment. Several optical and sensor physics phenomena were identified and mitigated during reconstruction:
+> The included benchmark dataset (`Scan_Test2`) was captured using a consumer smartphone (**Motorola Edge 40 Neo**) inside a residential indoor environment as a stress-test:
 
 ### 1. Indoor GNSS Multipath & Dilution of Precision (DOP)
 * **Indoor GPS Attenuation:** GPS/GNSS signals experience radio-frequency attenuation and multi-path reflections through reinforced concrete ceilings and walls.
-* **Accuracy Distinction:** While the **relative inter-camera baseline vectors** $\Delta \mathbf{C}_{ij}$ computed via epipolar geometry and bundle adjustment possess sub-millimeter relative precision ($\sigma_{\text{SfM}} \approx \pm 0.8\text{ mm}$), the absolute **WGS84 geodetic coordinates** (Lat $44.54852^\circ$, Lon $26.06934^\circ$, Alt $132.0\text{ m}$) have an expected indoor dilution uncertainty of $\pm 5\text{--}15\text{ m}$.
+* **Accuracy Distinction:** While the **relative inter-camera baseline vectors** $\Delta \mathbf{C}_{ij}$ computed via epipolar geometry and bundle adjustment possess sub-millimeter relative precision ($\sigma_{\text{SfM}} \approx \pm 0.8\text{ mm}$), the absolute **WGS84 geodetic coordinates** (Lat $44.54852^\circ$, Lon $26.06934^\circ$, Alt $132.0\text{ m}$) carry an expected indoor dilution uncertainty of $\pm 5\text{--}15\text{ m}$.
 
 ### 2. SIFT Keypoint Disparity on Black / Textureless Objects
 * **Background vs. Foreground Distribution:**
   * **Background Keypoints (Table wood grain, chair bars, tiles):** $20,976\text{ points } (92.4\%)$
   * **Foreground Keypoints (Black speaker body):** $1,726\text{ points } (7.6\%)$
-* **Significance:** Black matte ballistic weave absorbs incident light, resulting in low local luminance gradients $\nabla I \approx 0$. This mathematically explains why classic MVS/Poisson surface triangulation failed, and validates the hybrid silhouette-constrained geometric synthesis approach.
+* **Significance:** Black matte surfaces absorb incident light ($\nabla I \approx 0$). This explains why classic MVS/Poisson surface triangulation failed, and validates the hybrid silhouette-constrained geometric synthesis approach.
 
 ### 3. Lens Breathing & Electronic Rolling Shutter Variance
 * **Autofocus Lens Breathing:** Handheld smartphone autofocus adjustments cause micro-variations in effective focal length between close-up and wide shots ($f \in [1410, 1465]\text{ px}$). The pipeline solves for the optimal global single-camera approximation ($f = 1436.1\text{ px}$).
@@ -196,9 +196,8 @@ $$\mathbf{N}_{\text{PBR}} = \left[ \frac{1}{2}\left(\frac{\mathbf{N}}{\|\mathbf{
 | **Mesh Vertices** | 5,954 |
 | **Mesh Triangles** | 11,720 |
 | **Texture Atlas** | 2048 × 1024 (PBR Albedo + Normal Map) |
-| **Watertight Solid** | Yes (`is_watertight = True`) |
 | **Hardware Footprint** | Standard Laptop / Low Resource (API-assisted) |
-| **Output Formats** | `.GLB` (Web 3D/AR), `.OBJ` (CAD), `.PLY` (Point Cloud) |
+| **Watertight Solid** | Yes (`is_watertight = True`) |
 | **Inference Time** | ~14.2 seconds |
 
 ---
@@ -221,18 +220,18 @@ Open **`http://localhost:8000`** in your browser.
 
 > ### 🌐 [👉 Deschide Vizualizatorul 3D Interactiv & AR în Browser](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/) 👈
 
-> **OmniScan 3D este pur și simplu un instrument practic de lucru, conceput pentru a ajuta inginerul să colecteze rapid date din teren și să genereze rapoarte 3D clare, vizuale și documentate pentru clienți și proiecte.**
+> **OmniScan 3D este un instrument practic de lucru, conceput pentru a ajuta inginerul să colecteze rapid date fotografice din teren și să genereze rapoarte 3D clare, vizuale și documentate pentru clienți și proiecte.**
 
-### 💡 Cerințe Hardware Reduse & Procesare prin API
-* **Nu este nevoie de calculatoare scumpe de mii de euro:** Evaluarea vizuală inteligentă și analiza imaginilor se realizează prin **NVIDIA NIM Cloud API** (`meta/llama-3.2-11b-vision-instruct`), fără a consuma memoria video (VRAM) a laptopului de teren.
-* **Rulează pe laptopuri obișnuite:** Calibrarea fotogrammetrică locală este optimizată să ruleze rapid pe orice laptop sau mini-PC standard.
-* **Livrare imediată către client:** Vizualizarea 3D se face direct în browser prin WebGL / `<model-viewer>`, deschizându-se instantaneu pe orice telefon, tabletă sau calculator de birou, fără a necesita programe CAD instalate.
+### 💡 Cerințe Hardware Reduse & Arhitectură Hibridă cu API
+* **Nucleu Local Ușor (Offline):** Motorul fotogrammetric (extragerea punctelor cheie SIFT, calibrarea camerelor SfM, planul de sprijin RANSAC și vizualizatorul WebGL) rulează local pe un laptop obișnuit de teren, fără a necesita plăci grafice scumpe de mii de euro.
+* **Asistent AI de Control Vizual prin Cloud API:** Analiza vizuală inteligentă și evaluarea calității sunt delegate către **NVIDIA NIM Cloud API** (`meta/llama-3.2-11b-vision-instruct`), fără a consuma memoria video (VRAM) a laptopului.
+* **Livrare Imediată către Client:** Modelele 3D sunt redate direct în browser prin WebGL / `<model-viewer>`, deschizându-se instantaneu pe orice telefon, tabletă sau calculator de birou, fără a necesita programe CAD instalate.
 
 ---
 
 ## 🌐 Vizualizator 3D Interactiv în Browser & AR
 
-Modelul 3D și traiectoria celor 59 de camere pot fi explorate direct în browser:
+Modelul 3D de test și traiectoria celor 59 de camere pot fi explorate direct în browser:
 * **Vizualizator Web Interactiv:** **[https://lefterpatrickandrei-sketch.github.io/OmniScan3D/](https://lefterpatrickandrei-sketch.github.io/OmniScan3D/)**
 * **Dashboard Web Local:** Rulează `python start_omniscan.py` și deschide `http://localhost:8000`.
 
@@ -241,14 +240,14 @@ Modelul 3D și traiectoria celor 59 de camere pot fi explorate direct în browse
 - Activare/Dezactivare piramide 3D pentru **toate cele 59 de direcții de cameră**
 - Inspecție foto reală, distanță calculată și metadate GPS la click pe fiecare unghi
 - Suport Realitate Augmentată (AR) direct pe mobil
-- Descărcare directă `.GLB`, `.OBJ` și `.PLY`
+- Descărcare directă `.GLB`, `.OBJ` și `.PLY` pentru rapoarte CAD/GIS
 
 ---
 
 ## 🏛️ Arhitectura Pipeline-ului
 
 ```
-              INPUT: 30-120 Fotografii Multi-View (cu Metadate EXIF & GPS)
+              INPUT: 30-120 Fotografii Multi-View din Teren (cu Metadate EXIF & GPS)
                                       │
                                       ▼
                ┌──────────────────────────────────────────────┐
@@ -259,35 +258,35 @@ Modelul 3D și traiectoria celor 59 de camere pot fi explorate direct în browse
                                       ▼
                ┌──────────────────────────────────────────────┐
                │ Etapa 2: Calibrare Camere SIFT / PyCOLMAP    │
-               │ SfM local ușor (59 cadre în câteva secunde)  │
+               │ SfM local ușor (59 cadre în ~14 secunde)     │
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
                ┌──────────────────────────────────────────────┐
-               │ Etapa 3: Planul Mesei RANSAC & Vector Normal │
+               │ Etapa 3: Planul de Sprijin / Sol (RANSAC)    │
                │ Estimare axă verticală u_up și sistem coord. │
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
                ┌──────────────────────────────────────────────┐
-               │ Etapa 4: Sinteză Geometrică Parametrică      │
-               │ Cilindru teşit + Discuri radiatoare pasive   │
+               │ Etapa 4: Sinteză Geometrică & Structurală    │
+               │ Modelare pe baza contururilor și siluetelor  │
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
                ┌──────────────────────────────────────────────┐
                │ Etapa 5: Texturare Macro-Chart & Hărți Sobel │
-               │ Ancorare siglă fără cusături + Normal Map    │
+               │ Blending unghiular continuu + Normal Map PBR │
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
                ┌──────────────────────────────────────────────┐
-               │ Etapa 6: Buclă de Critică NVIDIA NIM API     │
-               │ Analiză AI prin Cloud (Zero consum VRAM local│
+               │ Etapa 6: Buclă de Control NVIDIA NIM API     │
+               │ Evaluare vizuală prin Cloud (Zero VRAM local)│
                └──────────────────────┬───────────────────────┘
                                       │
                                       ▼
-               OUTPUT: Model 3D PBR Calibrat (.GLB, .OBJ, .PLY, JSON)
+               OUTPUT: Model 3D PBR Calibrat & Raport (.GLB, .OBJ, .PLY, JSON)
 ```
 
 ---
@@ -324,9 +323,9 @@ $$\left( \sum_{i=1}^N (\mathbf{I} - \mathbf{v}_i \mathbf{v}_i^T) \right) \mathbf
 
 ---
 
-### 3. Estimarea Planului Mesei via RANSAC
+### 3. Estimarea Planului de Sprijin / Sol via RANSAC
 
-Ecuația planului mesei $\mathbf{n}_{\text{plan}} \cdot \mathbf{x} + d = 0$ este extrasă din norul de puncte sparse $\mathcal{P} \subset \mathbb{R}^3$:
+Ecuația planului de sprijin $\mathbf{n}_{\text{plan}} \cdot \mathbf{x} + d = 0$ este extrasă din norul de puncte sparse $\mathcal{P} \subset \mathbb{R}^3$:
 
 $$\mathbf{n}_{\text{plan}} = \frac{(\mathbf{p}_2 - \mathbf{p}_1) \times (\mathbf{p}_3 - \mathbf{p}_1)}{\|(\mathbf{p}_2 - \mathbf{p}_1) \times (\mathbf{p}_3 - \mathbf{p}_1)\|}$$
 
@@ -358,7 +357,7 @@ $$\mathbf{N}_{\text{PBR}} = \left[ \frac{1}{2}\left(\frac{\mathbf{N}}{\|\mathbf{
 
 > [!NOTE]
 > **Condiții de Captură & Constrângeri Fizice:**  
-> Setul de date a fost capturat cu un telefon (**Motorola Edge 40 Neo**) în interiorul unei clădiri rezidențiale:
+> Setul de date inclus (`Scan_Test2`) a fost capturat cu un telefon (**Motorola Edge 40 Neo**) în interiorul unei clădiri rezidențiale drept test de anduranță:
 
 1. **Atenuarea GPS & Multipath în Interior:**  
    Semnalul GPS a fost atenuat de pereții din beton ($\pm 5\text{--}15\text{ m}$ eroare geodezică absolută), în timp ce traiectoria relativă a camerelor obținută prin SfM are o precizie milimetrică ($\pm 0.8\text{ mm}$).
@@ -369,7 +368,7 @@ $$\mathbf{N}_{\text{PBR}} = \left[ \frac{1}{2}\left(\frac{\mathbf{N}}{\|\mathbf{
 4. **Decuplare HDR & Reflexii Speculare:**  
    19 cadre HDR au fost omogenizate prin separarea texturii difuze de harta de relief Sobel.
 5. **Calibrarea Scării Metrice:**  
-   Scara monoculară invariantă a fost fixată raportat la planul mesei via RANSAC.
+   Scara monoculară invariantă a fost fixată raportat la planul de sprijin via RANSAC.
 
 ---
 
